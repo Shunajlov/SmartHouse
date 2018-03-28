@@ -7,6 +7,7 @@ import com.smartcity.smartHouse.dataModel.apiResults.AuthRoomerResult;
 import java.util.Map;
 
 public class Utils {
+//    isTokenValid
     public static boolean isTokenValid(String token) {
         for (Map.Entry<String, AuthRoomerResult> entry : Const.tokenRoomersMap.entrySet()) {
             if (entry.getValue().getToken() != null && entry.getValue().getToken().equals(token))
