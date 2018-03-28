@@ -1,14 +1,6 @@
 package com.smartcity.smartHouse;
 
-import com.smartcity.smartHouse.dataModel.apiResults.AuthResult;
-import com.smartcity.smartHouse.dataModel.apiResults.AuthRoomerResult;
-
-import java.util.HashMap;
-
 public class Const {
-    public static HashMap<String, AuthResult> tokenUsersMap = new HashMap<>();
-    public static HashMap<String, AuthRoomerResult> tokenRoomersMap = new HashMap<>();
-
     public static final int PORT = 8080;
 
     public static final String TEST = "/api/test/:name";
@@ -45,7 +37,7 @@ public class Const {
      "houseId" : "1"
      }
      */
-    public static final String ADD_ROOMER = "/api/regRoomer/:login/:password/:houseId/:token";
+    public static final String ADD_USER = "/api/regRoomer/:login/:password/:houseId/:token";
 
     /**
      * Список жильцов в доме
@@ -64,4 +56,6 @@ public class Const {
      }
      */
     public static final String ROOMERS_LIST = "/api/roomersList/:houseId/:token";
+
+
 }

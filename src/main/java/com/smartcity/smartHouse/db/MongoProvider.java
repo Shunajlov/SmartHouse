@@ -1,6 +1,5 @@
 package com.smartcity.smartHouse.db;
 
-import com.smartcity.smartHouse.dataModel.model.Roomer;
 import com.smartcity.smartHouse.dataModel.model.TestClass;
 import com.smartcity.smartHouse.dataModel.model.User;
 import io.vertx.core.Vertx;
@@ -10,7 +9,7 @@ import io.vertx.ext.mongo.MongoClient;
 public class MongoProvider {
     private static MongoClient client;
 
-    public static void initDb(Vertx vertx) {
+    private static void initDb(Vertx vertx) {
         JsonObject config = new JsonObject();
         config.put("host", "159.65.120.1");
         config.put("port", 27017);
@@ -33,13 +32,13 @@ public class MongoProvider {
         if (client == null) initDb(vertx);
 
         JsonObject user1 = JsonObject.mapFrom(user);
-        client.save(Table.SM_USER, user1, result -> {
+        client.save(Table.SM_INTEGRATOR, user1, result -> {
             if (result.succeeded())
                 System.out.println("wow some data inserted");
         });
     }
 
-    public static void writeRoomer(Vertx vertx, Roomer roomer) {
+    public static void writeRoomer(Vertx vertx) {
 
     }
 

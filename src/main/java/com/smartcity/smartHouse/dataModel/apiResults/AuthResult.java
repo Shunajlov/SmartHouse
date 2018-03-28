@@ -5,15 +5,25 @@ import java.util.UUID;
 
 public class AuthResult extends BasicResult implements Serializable {
     private String token, login, password;
+    private boolean isIntegrator;
 
     public AuthResult() {
         super();
     }
 
-    public AuthResult(String login, String password) {
+    public AuthResult(String login, String password, boolean isIntegrator) {
         this.login = login;
         this.password = password;
+        this.isIntegrator = isIntegrator;
         token = generateToken();
+    }
+
+    public boolean isIntegrator() {
+        return isIntegrator;
+    }
+
+    public void setIntegrator(boolean integrator) {
+        isIntegrator = integrator;
     }
 
     public String getToken() {

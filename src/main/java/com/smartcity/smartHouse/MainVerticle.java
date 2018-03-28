@@ -4,9 +4,6 @@ import com.smartcity.smartHouse.dataModel.apiResults.AuthResult;
 import com.smartcity.smartHouse.dataModel.apiResults.AuthRoomerResult;
 import com.smartcity.smartHouse.dataModel.apiResults.BasicResult;
 import com.smartcity.smartHouse.dataModel.apiResults.RoomersHouseResult;
-import com.smartcity.smartHouse.dataModel.model.Roomer;
-import com.smartcity.smartHouse.dataModel.model.User;
-import com.smartcity.smartHouse.db.MongoProvider;
 import com.smartcity.smartHouse.utils.Utils;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Future;
@@ -20,7 +17,6 @@ import io.vertx.ext.web.handler.CorsHandler;
 
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 public class MainVerticle extends AbstractVerticle {
@@ -45,7 +41,7 @@ public class MainVerticle extends AbstractVerticle {
         // routes
         router.get(Const.TEST).handler(this::handleTestMethod);
         router.get(Const.AUTH).handler(this::handleAuth);
-        router.get(Const.ADD_ROOMER).handler(this::handleAddRoomer);
+        router.get(Const.ADD_USER).handler(this::handleAddRoomer);
         router.get(Const.ROOMERS_LIST).handler(this::handleListRoomers);
 
         vertx.createHttpServer()
@@ -84,16 +80,17 @@ public class MainVerticle extends AbstractVerticle {
     private void handleAuth(RoutingContext context) {
         String login = context.request().getParam("login");
         String password = context.request().getParam("password");
-        AuthResult result = new AuthResult(login, password);
+        AuthResult result = new AuthResult(login, password, true);
+        // TODO забирать данные из монгодб
 
-        if (Const.tokenUsersMap.containsKey(login)) {
-            sendError(401, context.response(), Json.encodePrettily(new BasicResult(1, "User already exists")));
-        } else {
-            Const.tokenUsersMap.put(login, result);
-            User user = User.fromAuthResult(result);
-            MongoProvider.writeUser(vertx, user);
-            context.response().end(Json.encodePrettily(result));
-        }
+//        if (Const.tokenUsersMap.containsKey(login)) {
+//            sendError(401, context.response(), Json.encodePrettily(new BasicResult(1, "User already exists")));
+//        } else {
+//            Const.tokenUsersMap.put(login, result);
+//            User user = User.fromAuthResult(result);
+//            MongoProvider.writeUser(vertx, user);
+//            context.response().end(Json.encodePrettily(result));
+//        }
     }
 
     private void handleAddRoomer(RoutingContext context) {
@@ -111,13 +108,13 @@ public class MainVerticle extends AbstractVerticle {
         result.setLogin(login);
         result.setPassword(password);
 
-        if (Const.tokenRoomersMap.containsKey(login)) {
-            sendError(401, context.response(), Json.encodePrettily(new BasicResult(1, "User already exists")));
-        } else {
-            Const.tokenRoomersMap.put(login, result);
-            MongoProvider.writeRoomer(vertx, new Roomer());
-            context.response().end(Json.encodePrettily(result));
-        }
+//        if (Const.tokenRoomersMap.containsKey(login)) {
+//            sendError(401, context.response(), Json.encodePrettily(new BasicResult(1, "User already exists")));
+//        } else {
+//            Const.tokenRoomersMap.put(login, result);
+//            MongoProvider.writeRoomer(vertx, new Roomer());
+//            context.response().end(Json.encodePrettily(result));
+//        }
     }
 
     private void handleListRoomers(RoutingContext context) {
@@ -129,10 +126,10 @@ public class MainVerticle extends AbstractVerticle {
 
         String houseId = context.request().getParam("houseId");
         ArrayList<AuthRoomerResult> roomersList = new ArrayList<>();
-        for (Map.Entry<String, AuthRoomerResult> entry : Const.tokenRoomersMap.entrySet()) {
-            if (entry.getValue().getHouseId() != null && entry.getValue().getHouseId().equals(houseId))
-                roomersList.add(entry.getValue());
-        }
+//        for (Map.Entry<String, AuthRoomerResult> entry : Const.tokenRoomersMap.entrySet()) {
+//            if (entry.getValue().getHouseId() != null && entry.getValue().getHouseId().equals(houseId))
+//                roomersList.add(entry.getValue());
+//        }
         context.response().end(Json.encodePrettily(new RoomersHouseResult(roomersList)));
     }
 }
