@@ -42,7 +42,6 @@ public class MainVerticle extends AbstractVerticle {
         router.route().handler(CorsHandler.create("*")
             .allowedHeaders(allowHeaders)
             .allowedMethods(allowMethods));
-
         // routes
         router.get(Const.TEST).handler(this::handleTestMethod);
         router.get(Const.AUTH).handler(this::handleAuth);
