@@ -33,7 +33,7 @@ public class MongoProvider {
         if (client == null) initDb(vertx);
 
         JsonObject user1 = JsonObject.mapFrom(user);
-        client.save(Table.USERS, user1, result -> {
+        client.save(Table.SM_USER, user1, result -> {
             if (result.succeeded())
                 System.out.println("wow some data inserted");
         });
