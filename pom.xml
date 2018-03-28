@@ -111,5 +111,12 @@
             <artifactId>vertx-mongo-client</artifactId>
             <version>${vertx.version}</version>
         </dependency>
+
+        <!-- https://mvnrepository.com/artifact/org.influxdb/influxdb-java -->
+        <dependency>
+            <groupId>org.influxdb</groupId>
+            <artifactId>influxdb-java</artifactId>
+            <version>2.9</version>
+        </dependency>
     </dependencies>
 </project>
