@@ -20,6 +20,41 @@
       <element id="extracted-dir" path="$MAVEN_REPOSITORY$/io/netty/netty-codec-dns/4.1.15.Final/netty-codec-dns-4.1.15.Final.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$MAVEN_REPOSITORY$/io/netty/netty-resolver/4.1.15.Final/netty-resolver-4.1.15.Final.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$MAVEN_REPOSITORY$/com/fasterxml/jackson/core/jackson-databind/2.9.0/jackson-databind-2.9.0.jar" path-in-jar="/" />
+      <element id="library" level="project" name="Maven: cglib:cglib-nodep:2.2.2" />
+      <element id="library" level="project" name="Maven: com.fasterxml.jackson.core:jackson-annotations:2.9.0" />
+      <element id="library" level="project" name="Maven: com.fasterxml.jackson.core:jackson-core:2.9.3" />
+      <element id="library" level="project" name="Maven: com.fasterxml.jackson.core:jackson-databind:2.9.3" />
+      <element id="library" level="project" name="Maven: com.squareup.moshi:moshi:1.4.0" />
+      <element id="library" level="project" name="Maven: com.squareup.okhttp3:logging-interceptor:3.9.1" />
+      <element id="library" level="project" name="Maven: com.squareup.okhttp3:okhttp:3.9.1" />
+      <element id="library" level="project" name="Maven: com.squareup.okio:okio:1.13.0" />
+      <element id="library" level="project" name="Maven: com.squareup.retrofit2:converter-moshi:2.3.0" />
+      <element id="library" level="project" name="Maven: com.squareup.retrofit2:retrofit:2.3.0" />
+      <element id="library" level="project" name="Maven: com.thoughtworks.proxytoys:proxytoys:1.0" />
+      <element id="library" level="project" name="Maven: io.netty:netty-buffer:4.1.19.Final" />
+      <element id="library" level="project" name="Maven: io.netty:netty-codec-dns:4.1.19.Final" />
+      <element id="library" level="project" name="Maven: io.netty:netty-codec-http2:4.1.19.Final" />
+      <element id="library" level="project" name="Maven: io.netty:netty-codec-http:4.1.19.Final" />
+      <element id="library" level="project" name="Maven: io.netty:netty-codec-socks:4.1.19.Final" />
+      <element id="library" level="project" name="Maven: io.netty:netty-codec:4.1.19.Final" />
+      <element id="library" level="project" name="Maven: io.netty:netty-common:4.1.19.Final" />
+      <element id="library" level="project" name="Maven: io.netty:netty-handler-proxy:4.1.19.Final" />
+      <element id="library" level="project" name="Maven: io.netty:netty-handler:4.1.19.Final" />
+      <element id="library" level="project" name="Maven: io.netty:netty-resolver-dns:4.1.19.Final" />
+      <element id="library" level="project" name="Maven: io.netty:netty-resolver:4.1.19.Final" />
+      <element id="library" level="project" name="Maven: io.netty:netty-transport:4.1.19.Final" />
+      <element id="library" level="project" name="Maven: io.vertx:vertx-auth-common:3.5.1" />
+      <element id="library" level="project" name="Maven: io.vertx:vertx-bridge-common:3.5.1" />
+      <element id="library" level="project" name="Maven: io.vertx:vertx-core:3.5.1" />
+      <element id="library" level="project" name="Maven: io.vertx:vertx-mongo-client:3.5.1" />
+      <element id="library" level="project" name="Maven: io.vertx:vertx-unit:3.5.1" />
+      <element id="library" level="project" name="Maven: io.vertx:vertx-web:3.5.1" />
+      <element id="library" level="project" name="Maven: org.influxdb:influxdb-java:2.9" />
+      <element id="library" level="project" name="Maven: org.mongodb.morphia:morphia:1.3.2" />
+      <element id="library" level="project" name="Maven: org.mongodb:bson:3.6.1" />
+      <element id="library" level="project" name="Maven: org.mongodb:mongo-java-driver:3.4.0" />
+      <element id="library" level="project" name="Maven: org.mongodb:mongodb-driver-async:3.6.1" />
+      <element id="library" level="project" name="Maven: org.mongodb:mongodb-driver-core:3.6.1" />
     </root>
   </artifact>
 </component>

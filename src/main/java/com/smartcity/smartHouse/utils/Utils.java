@@ -1,7 +1,8 @@
 package com.smartcity.smartHouse.utils;
 
-import com.smartcity.smartHouse.dataModel.AuthResult;
-import com.smartcity.smartHouse.dataModel.AuthRoomerResult;
+import com.smartcity.smartHouse.Const;
+import com.smartcity.smartHouse.dataModel.apiResults.AuthResult;
+import com.smartcity.smartHouse.dataModel.apiResults.AuthRoomerResult;
 
 import java.util.Map;
 

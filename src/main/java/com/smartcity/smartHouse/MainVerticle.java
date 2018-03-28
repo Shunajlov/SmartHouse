@@ -1,10 +1,12 @@
 package com.smartcity.smartHouse;
 
-import com.smartcity.smartHouse.dataModel.AuthResult;
-import com.smartcity.smartHouse.dataModel.AuthRoomerResult;
-import com.smartcity.smartHouse.dataModel.BasicAnswer;
-import com.smartcity.smartHouse.dataModel.RoomersHouseResult;
-import com.smartcity.smartHouse.utils.Const;
+import com.smartcity.smartHouse.dataModel.apiResults.AuthResult;
+import com.smartcity.smartHouse.dataModel.apiResults.AuthRoomerResult;
+import com.smartcity.smartHouse.dataModel.apiResults.BasicResult;
+import com.smartcity.smartHouse.dataModel.apiResults.RoomersHouseResult;
+import com.smartcity.smartHouse.dataModel.model.Roomer;
+import com.smartcity.smartHouse.dataModel.model.User;
+import com.smartcity.smartHouse.db.MongoProvider;
 import com.smartcity.smartHouse.utils.Utils;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Future;
@@ -64,7 +66,7 @@ public class MainVerticle extends AbstractVerticle {
     }
 
     private void sendBadTokenError(HttpServerResponse response) {
-        response.setStatusCode(401).end(Json.encodePrettily(new BasicAnswer(5, "Bad user token")));
+        response.setStatusCode(401).end(Json.encodePrettily(new BasicResult(5, "Bad user token")));
     }
 
     private void handleTestMethod(RoutingContext context) {
@@ -73,7 +75,7 @@ public class MainVerticle extends AbstractVerticle {
             sendError(400, context.response(), "");
         else {
             HttpServerResponse response = context.response();
-            response.end(Json.encodePrettily(new BasicAnswer("Hello, " + name + "!")));
+            response.end(Json.encodePrettily(new BasicResult("Hello, " + name + "!")));
         }
     }
 
@@ -86,10 +88,11 @@ public class MainVerticle extends AbstractVerticle {
         AuthResult result = new AuthResult(login, password);
 
         if (Const.tokenUsersMap.containsKey(login)) {
-            sendError(401, context.response(), Json.encodePrettily(new BasicAnswer(1, "User already exists")));
+            sendError(401, context.response(), Json.encodePrettily(new BasicResult(1, "User already exists")));
         } else {
             Const.tokenUsersMap.put(login, result);
-
+            User user = User.fromAuthResult(result);
+            MongoProvider.writeUser(vertx, user);
             context.response().end(Json.encodePrettily(result));
         }
     }
@@ -110,9 +113,10 @@ public class MainVerticle extends AbstractVerticle {
         result.setPassword(password);
 
         if (Const.tokenRoomersMap.containsKey(login)) {
-            sendError(401, context.response(), Json.encodePrettily(new BasicAnswer(1, "User already exists")));
+            sendError(401, context.response(), Json.encodePrettily(new BasicResult(1, "User already exists")));
         } else {
             Const.tokenRoomersMap.put(login, result);
+            MongoProvider.writeRoomer(vertx, new Roomer());
             context.response().end(Json.encodePrettily(result));
         }
     }

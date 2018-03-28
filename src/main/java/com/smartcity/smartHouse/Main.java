@@ -1,6 +1,5 @@
 package com.smartcity.smartHouse;
 
-import com.smartcity.smartHouse.utils.Const;
 import io.vertx.core.Verticle;
 import io.vertx.core.Vertx;
 
