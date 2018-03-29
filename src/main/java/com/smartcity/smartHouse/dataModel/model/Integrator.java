@@ -4,14 +4,14 @@ import com.smartcity.smartHouse.dataModel.apiResults.AuthResult;
 
 import java.util.UUID;
 
-public class User {
+public class Integrator {
     private String login, password, token;
 
-    public User(String login) {
+    public Integrator(String login) {
         this.login = login;
     }
 
-    public User(String login, String password) {
+    public Integrator(String login, String password) {
         this.login = login;
         this.password = password;
         this.token = generateToken();
@@ -41,8 +41,8 @@ public class User {
         this.token = token;
     }
 
-    public static User fromAuthResult(AuthResult result) {
-        User user = new User(result.getLogin(), result.getPassword());
+    public static Integrator fromAuthResult(AuthResult result) {
+        Integrator user = new Integrator(result.getLogin(), result.getPassword());
         user.setToken(result.getToken());
         return user;
     }

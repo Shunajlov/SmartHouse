@@ -2,10 +2,10 @@ package com.smartcity.smartHouse.dataModel.apiResults;
 
 import java.io.Serializable;
 
-public class AuthRoomerResult extends AuthResult implements Serializable {
+public class AuthUserResult extends AuthResult implements Serializable {
     private String houseId;
 
-    public AuthRoomerResult(String houseId) {
+    public AuthUserResult(String houseId) {
         this.houseId = houseId;
     }
 

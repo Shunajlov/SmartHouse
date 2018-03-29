@@ -1,9 +1,10 @@
 package com.smartcity.smartHouse;
 
-import com.smartcity.smartHouse.dataModel.apiResults.AuthResult;
-import com.smartcity.smartHouse.dataModel.apiResults.AuthRoomerResult;
-import com.smartcity.smartHouse.dataModel.apiResults.BasicResult;
-import com.smartcity.smartHouse.dataModel.apiResults.RoomersHouseResult;
+import com.smartcity.smartHouse.dataModel.Storage.SM_HOUSE;
+import com.smartcity.smartHouse.dataModel.Storage.SM_INTEGRATOR;
+import com.smartcity.smartHouse.dataModel.Storage.SM_USER;
+import com.smartcity.smartHouse.dataModel.apiResults.*;
+import com.smartcity.smartHouse.db.MongoDbProvider;
 import com.smartcity.smartHouse.utils.Utils;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Future;
@@ -15,9 +16,7 @@ import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.handler.BodyHandler;
 import io.vertx.ext.web.handler.CorsHandler;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 public class MainVerticle extends AbstractVerticle {
 
@@ -41,8 +40,10 @@ public class MainVerticle extends AbstractVerticle {
         // routes
         router.get(Const.TEST).handler(this::handleTestMethod);
         router.get(Const.AUTH).handler(this::handleAuth);
-        router.get(Const.ADD_USER).handler(this::handleAddRoomer);
-        router.get(Const.ROOMERS_LIST).handler(this::handleListRoomers);
+        router.post(Const.USER_ADD).handler(this::handleUserAdd);
+        router.post(Const.USER_DELETE).handler(this::handleUserDelete);
+        router.get(Const.USERS_LIST).handler(this::handleListUsers);
+        router.get(Const.HOUSES_LIST).handler(this::handleListHouses);
 
         vertx.createHttpServer()
             .requestHandler(router::accept)
@@ -60,8 +61,12 @@ public class MainVerticle extends AbstractVerticle {
         response.setStatusCode(statusCode).end(message);
     }
 
-    private void sendBadTokenError(HttpServerResponse response) {
+    private void sendBadUserTokenError(HttpServerResponse response) {
         response.setStatusCode(401).end(Json.encodePrettily(new BasicResult(5, "Bad user token")));
+    }
+
+    private void sendBadIntegratorTokenError(HttpServerResponse response) {
+        response.setStatusCode(401).end(Json.encodePrettily(new BasicResult(5, "Bad integrator token")));
     }
 
     private void handleTestMethod(RoutingContext context) {
@@ -73,6 +78,8 @@ public class MainVerticle extends AbstractVerticle {
             response.end(Json.encodePrettily(new BasicResult("Hello, " + name + "!")));
         }
     }
+
+    // USER
 
     /**
      * Авторизация
@@ -91,45 +98,120 @@ public class MainVerticle extends AbstractVerticle {
 //            MongoProvider.writeUser(vertx, user);
 //            context.response().end(Json.encodePrettily(result));
 //        }
+
+        SM_USER user = MongoDbProvider.getUser(result.getLogin(), result.getPassword());
+        if (user == null) {
+            sendError(401, context.response(), Json.encodePrettily(new BasicResult(1, "No such user")));
+        } else {
+            context.response().end(Json.encodePrettily(result));
+        }
     }
 
-    private void handleAddRoomer(RoutingContext context) {
+    private void handleUserAdd(RoutingContext context) {
         String token = context.request().getParam("token");
-        if (!Utils.isTokenValid(token)) {
-            sendBadTokenError(context.response());
+
+        SM_INTEGRATOR integrator = MongoDbProvider.getIntegrator(token);
+
+        if (integrator == null) { //|| !Utils.isTokenValid(token)) {
+            sendBadIntegratorTokenError(context.response());
             return;
         }
 
         String login = context.request().getParam("login");
-        String password = context.request().getParam("password");
-        String houseId = context.request().getParam("houseId");
 
-        AuthRoomerResult result = new AuthRoomerResult(houseId);
-        result.setLogin(login);
-        result.setPassword(password);
+        List<SM_USER> usersWithLogin = MongoDbProvider.getUsersWithLogin(login);
 
-//        if (Const.tokenRoomersMap.containsKey(login)) {
-//            sendError(401, context.response(), Json.encodePrettily(new BasicResult(1, "User already exists")));
-//        } else {
-//            Const.tokenRoomersMap.put(login, result);
-//            MongoProvider.writeRoomer(vertx, new Roomer());
-//            context.response().end(Json.encodePrettily(result));
-//        }
+        if (!(usersWithLogin == null || usersWithLogin.isEmpty())) {
+            sendError(401, context.response(), Json.encodePrettily(new BasicResult(1, "Login exists")));
+            return;
+        }
+
+        SM_USER user = new SM_USER();
+
+        user.login = login;
+        user.password = context.request().getParam("password");
+        user.houseId = context.request().getParam("houseId");
+
+        AuthUserResult result = new AuthUserResult(user.houseId);
+        result.setLogin(user.login);
+        result.setPassword(user.password);
+
+        MongoDbProvider.saveUser(user);
+        context.response().end(Json.encodePrettily(result));
     }
 
-    private void handleListRoomers(RoutingContext context) {
+    private void handleUserDelete(RoutingContext context) {
         String token = context.request().getParam("token");
-        if (!Utils.isTokenValid(token)) {
-            sendBadTokenError(context.response());
+
+        SM_INTEGRATOR integrator = MongoDbProvider.getIntegrator(token);
+
+        if (integrator == null) {
+            sendBadIntegratorTokenError(context.response());
+            return;
+        }
+
+        String login = context.request().getParam("login");
+
+        MongoDbProvider.deleteUser(login);
+
+        context.response().end(Json.encodePrettily(new BasicResult(1, "User deleted")));
+    }
+
+    private void handleListUsers(RoutingContext context) {
+        String token = context.request().getParam("token");
+
+        //        if (!Utils.isTokenValid(token)) {
+//            sendBadIntegratorTokenError(context.response());
+//            return;
+//        }
+
+        SM_INTEGRATOR integrator = MongoDbProvider.getIntegrator(token);
+
+        if (integrator == null) { //|| !Utils.isTokenValid(token)) {
+            sendBadIntegratorTokenError(context.response());
             return;
         }
 
         String houseId = context.request().getParam("houseId");
-        ArrayList<AuthRoomerResult> roomersList = new ArrayList<>();
-//        for (Map.Entry<String, AuthRoomerResult> entry : Const.tokenRoomersMap.entrySet()) {
-//            if (entry.getValue().getHouseId() != null && entry.getValue().getHouseId().equals(houseId))
-//                roomersList.add(entry.getValue());
-//        }
-        context.response().end(Json.encodePrettily(new RoomersHouseResult(roomersList)));
+        ArrayList<GetUserResult> users = new ArrayList<>();
+
+        List<SM_USER> mongoUsers = MongoDbProvider.getUsers(houseId);
+
+        if (mongoUsers != null && !mongoUsers.isEmpty()) {
+            for (SM_USER user: mongoUsers) {
+                users.add(new GetUserResult(user));
+            }
+
+            context.response().end(Json.encodePrettily(new GetUsersResult(users)));
+        } else {
+            sendError(401, context.response(), Json.encodePrettily(new BasicResult(1, "No users")));
+        }
+    }
+
+    // HOUSE
+
+    private void handleListHouses(RoutingContext context) {
+        String token = context.request().getParam("token");
+
+        SM_INTEGRATOR integrator = MongoDbProvider.getIntegrator(token);
+
+        if (integrator == null) {
+            sendBadIntegratorTokenError(context.response());
+            return;
+        }
+
+        ArrayList<GetHouseRequest> houses = new ArrayList<>();
+
+        List<SM_HOUSE> mongoHouses = MongoDbProvider.getHouses();
+
+        if (mongoHouses != null && !mongoHouses.isEmpty()) {
+            for (SM_HOUSE house: mongoHouses) {
+                houses.add(new GetHouseRequest(house));
+            }
+
+            context.response().end(Json.encodePrettily(new GetHousesRequest(houses)));
+        } else {
+            sendError(401, context.response(), Json.encodePrettily(new BasicResult(1, "No houses")));
+        }
     }
 }

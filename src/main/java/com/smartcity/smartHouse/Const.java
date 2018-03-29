@@ -1,9 +1,17 @@
 package com.smartcity.smartHouse;
 
+//import com.smartcity.smartHouse.dataModel.apiResults.AuthResult;
+//import com.smartcity.smartHouse.dataModel.apiResults.AuthRoomerResult;
+
+import java.util.HashMap;
+
 public class Const {
     public static final int PORT = 8080;
 
     public static final String TEST = "/api/test/:name";
+
+//    public static HashMap<String, AuthResult> tokenUsersMap = new HashMap<>();
+//    public static HashMap<String, AuthRoomerResult> tokenRoomersMap = new HashMap<>();
 
     /*
     Если токен не существует
@@ -37,7 +45,9 @@ public class Const {
      "houseId" : "1"
      }
      */
-    public static final String ADD_USER = "/api/regRoomer/:login/:password/:houseId/:token";
+    public static final String USER_ADD = "/api/userAdd/:login/:password/:houseId/:token";
+
+    public static final String USER_DELETE = "/api/userDelete/:login/:token";
 
     /**
      * Список жильцов в доме
@@ -55,7 +65,10 @@ public class Const {
      } ]
      }
      */
-    public static final String ROOMERS_LIST = "/api/roomersList/:houseId/:token";
+    public static final String USERS_LIST = "/api/users/:houseId/:token";
+
+
+    public static final String HOUSES_LIST = "/api/houses/:token";
 
 
 }

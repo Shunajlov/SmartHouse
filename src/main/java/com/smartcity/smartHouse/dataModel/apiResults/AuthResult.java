@@ -3,9 +3,9 @@ package com.smartcity.smartHouse.dataModel.apiResults;
 import java.io.Serializable;
 import java.util.UUID;
 
-public class AuthResult extends BasicResult implements Serializable {
-    private String token, login, password;
-    private boolean isIntegrator;
+public class AuthResult implements Serializable {
+    protected String token, login, password;
+    protected boolean isIntegrator;
 
     public AuthResult() {
         super();
