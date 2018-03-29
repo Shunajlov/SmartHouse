@@ -1,12 +1,8 @@
 package com.smartcity.smartHouse;
 
-import com.smartcity.smartHouse.dataModel.Storage.SM_HOUSE;
-import com.smartcity.smartHouse.dataModel.Storage.SM_INTEGRATOR;
-import com.smartcity.smartHouse.dataModel.Storage.SM_SENSOR;
-import com.smartcity.smartHouse.dataModel.Storage.SM_USER;
+import com.smartcity.smartHouse.dataModel.Storage.*;
 import com.smartcity.smartHouse.dataModel.apiResults.*;
 import com.smartcity.smartHouse.db.MongoDbProvider;
-import com.smartcity.smartHouse.utils.Utils;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Future;
 import io.vertx.core.http.HttpMethod;
@@ -17,7 +13,10 @@ import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.handler.BodyHandler;
 import io.vertx.ext.web.handler.CorsHandler;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 public class MainVerticle extends AbstractVerticle {
 
@@ -53,7 +52,9 @@ public class MainVerticle extends AbstractVerticle {
         router.get(Const.SENSOR).handler(this::handleSensor);
         router.get(Const.SENSOR_DELETE).handler(this::handleSensorDelete);
 
-
+        router.get(Const.ACTORS_LIST).handler(this::handleActors);
+        router.get(Const.ACTOR).handler(this::handleActor);
+        router.get(Const.ACTOR_DELETE).handler(this::handleActorDelete);
 
         vertx.createHttpServer()
             .requestHandler(router::accept)
@@ -289,5 +290,68 @@ public class MainVerticle extends AbstractVerticle {
         MongoDbProvider.deleteSensor(sensorId);
 
         context.response().end(Json.encodePrettily(new BasicResult(1, "Sensor deleted")));
+    }
+
+    // ACTOR
+
+    private void handleActors(RoutingContext context) {
+        String token = context.request().getParam("token");
+
+        SM_USER user = MongoDbProvider.getUser(token);
+
+        if (user == null) {
+            sendBadUserTokenError(context.response());
+            return;
+        }
+
+        String houseId = context.request().getParam("houseId");
+        ArrayList<GetActorResult> actors = new ArrayList<>();
+
+        List<SM_ACTOR> mongoActors = MongoDbProvider.getActors(houseId);
+
+        if (mongoActors != null && !mongoActors.isEmpty()) {
+            for (SM_ACTOR actor: mongoActors) {
+                actors.add(new GetActorResult(actor));
+            }
+
+            context.response().end(Json.encodePrettily(new GetActorsResult(actors)));
+        } else {
+            sendError(401, context.response(), Json.encodePrettily(new BasicResult(1, "No actors")));
+        }
+    }
+
+    private void handleActor(RoutingContext context) {
+        String token = context.request().getParam("token");
+
+        SM_USER user = MongoDbProvider.getUser(token);
+
+        if (user == null) {
+            sendBadUserTokenError(context.response());
+            return;
+        }
+
+        String actorId = context.request().getParam("actorId");
+        SM_ACTOR actor = MongoDbProvider.getActor(actorId);
+
+        if (actor == null) {
+            sendError(401, context.response(), Json.encodePrettily(new BasicResult(1, "No such actor")));
+        } else {
+            context.response().end(Json.encodePrettily(new GetActorResult(actor)));
+        }
+    }
+
+    private void handleActorDelete(RoutingContext context) {
+        String token = context.request().getParam("token");
+        SM_INTEGRATOR integrator = MongoDbProvider.getIntegrator(token);
+
+        if (integrator == null) {
+            sendBadIntegratorTokenError(context.response());
+            return;
+        }
+
+        String actorId = context.request().getParam("actorId");
+        MongoDbProvider.deleteActor(actorId);
+
+        context.response().end(Json.encodePrettily(new BasicResult(1, "Actor deleted")));
     }
 }

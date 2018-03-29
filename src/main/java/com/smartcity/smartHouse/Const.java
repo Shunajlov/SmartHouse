@@ -3,8 +3,6 @@ package com.smartcity.smartHouse;
 //import com.smartcity.smartHouse.dataModel.apiResults.AuthResult;
 //import com.smartcity.smartHouse.dataModel.apiResults.AuthRoomerResult;
 
-import java.util.HashMap;
-
 public class Const {
     public static final int PORT = 8080;
 
@@ -75,5 +73,5 @@ public class Const {
 
     public static final String ACTORS_LIST = "/api/actors/:actorId/:token";
     public static final String ACTOR = "/api/sensor/:actorId/:token";
-    public static final String ACTOR_DELETE = "/api/actorDelete/:sensorId/:token";
+    public static final String ACTOR_DELETE = "/api/actorDelete/:actorId/:token";
 }

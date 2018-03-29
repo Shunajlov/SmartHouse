@@ -217,7 +217,6 @@ public class MongoDbProvider {
     }
 
     public static List<SM_ACTOR> getActors(String houseId) {
-
         final List<SM_ACTOR> actors = datastore.createQuery(SM_ACTOR.class)
             .field("houseId").equal(houseId)
             .asList();
@@ -228,6 +227,20 @@ public class MongoDbProvider {
         } else {
             System.out.println("Actors count" + actors.size());
             return actors;
+        }
+    }
+
+    public static void deleteActor(String actorId) {
+        final List<SM_ACTOR> sensors = datastore.createQuery(SM_ACTOR.class)
+            .field("_id").equal(new ObjectId(actorId))
+            .asList();
+
+        if (sensors == null || sensors.isEmpty()) {
+            System.out.println("No such actor");
+        } else {
+            SM_ACTOR sensor = sensors.get(0);
+            datastore.delete(sensor);
+            System.out.println("Actor deleted: " + sensor.getId().toString());
         }
     }
 
