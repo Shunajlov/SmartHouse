@@ -2,7 +2,7 @@ package com.smartcity.smartHouse.dataModel.apiResults;
 
 import java.util.ArrayList;
 
-public class GetSensorsResult extends BasicResult {
+public class GetSensorsResult {
     private ArrayList<GetSensorResult> sensors;
 
     public GetSensorsResult(ArrayList<GetSensorResult> sensors) {

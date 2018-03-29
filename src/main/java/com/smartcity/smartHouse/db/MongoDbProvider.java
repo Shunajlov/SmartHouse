@@ -189,7 +189,7 @@ public class MongoDbProvider {
     public static SM_ACTOR getActor(String actorId) {
 
         final List<SM_ACTOR> actors = datastore.createQuery(SM_ACTOR.class)
-            .field("actorId").equal(actorId)
+            .field("_id").equal(new ObjectId(actorId))
             .asList();
 
         if (actors == null || actors.isEmpty()) {
@@ -313,4 +313,22 @@ public class MongoDbProvider {
     public static void saveSensor(SM_SENSOR sensor) {
         datastore.save(sensor);
     }
+
+    // SM_HISTORY
+
+    public static List<SM_HISTORY> getAllHistory() {
+
+        final List<SM_HISTORY> historyList = datastore.createQuery(SM_HISTORY.class)
+            .asList();
+
+        if (historyList == null || historyList.isEmpty()) {
+            System.out.println("No history");
+            return null;
+        } else {
+            System.out.println("History count" + historyList.size());
+            return historyList;
+        }
+    }
+
+    public static void saveHistory(SM_HISTORY history) { datastore.save(history); }
 }

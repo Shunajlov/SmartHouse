@@ -1,5 +1,6 @@
 package com.smartcity.smartHouse;
 
+import com.mongodb.Mongo;
 import com.smartcity.smartHouse.dataModel.Storage.*;
 import com.smartcity.smartHouse.dataModel.apiResults.*;
 import com.smartcity.smartHouse.db.MongoDbProvider;
@@ -72,12 +73,8 @@ public class MainVerticle extends AbstractVerticle {
         response.setStatusCode(statusCode).end(message);
     }
 
-    private void sendBadUserTokenError(HttpServerResponse response) {
-        response.setStatusCode(401).end(Json.encodePrettily(new BasicResult(5, "Bad user token")));
-    }
-
-    private void sendBadIntegratorTokenError(HttpServerResponse response) {
-        response.setStatusCode(401).end(Json.encodePrettily(new BasicResult(5, "Bad integrator token")));
+    private void sendBadTokenError(HttpServerResponse response) {
+        response.setStatusCode(401).end(Json.encodePrettily(new BasicResult(5, "Bad token")));
     }
 
     private void handleTestMethod(RoutingContext context) {
@@ -90,6 +87,12 @@ public class MainVerticle extends AbstractVerticle {
         }
     }
 
+    private Boolean validToken(String token) {
+        SM_USER user = MongoDbProvider.getUser(token);
+        SM_INTEGRATOR integrator = MongoDbProvider.getIntegrator(token);
+        return (user != null || integrator != null);
+    }
+
     // USER
 
     /**
@@ -98,22 +101,17 @@ public class MainVerticle extends AbstractVerticle {
     private void handleAuth(RoutingContext context) {
         String login = context.request().getParam("login");
         String password = context.request().getParam("password");
-        AuthResult result = new AuthResult(login, password, true);
-        // TODO забирать данные из монгодб
 
-//        if (Const.tokenUsersMap.containsKey(login)) {
-//            sendError(401, context.response(), Json.encodePrettily(new BasicResult(1, "User already exists")));
-//        } else {
-//            Const.tokenUsersMap.put(login, result);
-//            User user = User.fromAuthResult(result);
-//            MongoProvider.writeUser(vertx, user);
-//            context.response().end(Json.encodePrettily(result));
-//        }
+        SM_USER user = MongoDbProvider.getUser(login, password);
+        SM_INTEGRATOR integrator = MongoDbProvider.getIntegrator(login, password);
 
-        SM_USER user = MongoDbProvider.getUser(result.getLogin(), result.getPassword());
-        if (user == null) {
-            sendError(401, context.response(), Json.encodePrettily(new BasicResult(1, "No such user")));
-        } else {
+        if (user == null && integrator == null) {
+            sendError(401, context.response(), Json.encodePrettily(new BasicResult(1, "No such user or integrator")));
+        } else if (user == null) { // is SM_INTEGRATOR
+            AuthResult result = new AuthResult(integrator.token, login, password, true);
+            context.response().end(Json.encodePrettily(result));
+        } else if (integrator == null) { // is SM_USER
+            AuthResult result = new AuthResult(user.token, login, password, false);
             context.response().end(Json.encodePrettily(result));
         }
     }
@@ -124,7 +122,7 @@ public class MainVerticle extends AbstractVerticle {
         SM_INTEGRATOR integrator = MongoDbProvider.getIntegrator(token);
 
         if (integrator == null) { //|| !Utils.isTokenValid(token)) {
-            sendBadIntegratorTokenError(context.response());
+            sendBadTokenError(context.response());
             return;
         }
 
@@ -157,7 +155,7 @@ public class MainVerticle extends AbstractVerticle {
         SM_INTEGRATOR integrator = MongoDbProvider.getIntegrator(token);
 
         if (integrator == null) {
-            sendBadIntegratorTokenError(context.response());
+            sendBadTokenError(context.response());
             return;
         }
 
@@ -171,15 +169,10 @@ public class MainVerticle extends AbstractVerticle {
     private void handleListUsers(RoutingContext context) {
         String token = context.request().getParam("token");
 
-        //        if (!Utils.isTokenValid(token)) {
-//            sendBadIntegratorTokenError(context.response());
-//            return;
-//        }
-
         SM_INTEGRATOR integrator = MongoDbProvider.getIntegrator(token);
 
-        if (integrator == null) { //|| !Utils.isTokenValid(token)) {
-            sendBadIntegratorTokenError(context.response());
+        if (integrator == null) {
+            sendBadTokenError(context.response());
             return;
         }
 
@@ -207,7 +200,7 @@ public class MainVerticle extends AbstractVerticle {
         SM_INTEGRATOR integrator = MongoDbProvider.getIntegrator(token);
 
         if (integrator == null) {
-            sendBadIntegratorTokenError(context.response());
+            sendBadTokenError(context.response());
             return;
         }
 
@@ -231,10 +224,8 @@ public class MainVerticle extends AbstractVerticle {
     private void handleListSensors(RoutingContext context) {
         String token = context.request().getParam("token");
 
-        SM_USER user = MongoDbProvider.getUser(token);
-
-        if (user == null) {
-            sendBadUserTokenError(context.response());
+        if (!validToken(token)) {
+            sendBadTokenError(context.response());
             return;
         }
 
@@ -257,15 +248,12 @@ public class MainVerticle extends AbstractVerticle {
     private void handleSensor(RoutingContext context) {
         String token = context.request().getParam("token");
 
-        SM_USER user = MongoDbProvider.getUser(token);
-
-        if (user == null) {
-            sendBadUserTokenError(context.response());
+        if (!validToken(token)) {
+            sendBadTokenError(context.response());
             return;
         }
 
         String sensorId = context.request().getParam("sensorId");
-
         SM_SENSOR sensor = MongoDbProvider.getSensor(sensorId);
 
         if (sensor == null) {
@@ -281,7 +269,7 @@ public class MainVerticle extends AbstractVerticle {
         SM_INTEGRATOR integrator = MongoDbProvider.getIntegrator(token);
 
         if (integrator == null) {
-            sendBadIntegratorTokenError(context.response());
+            sendBadTokenError(context.response());
             return;
         }
 
@@ -297,10 +285,8 @@ public class MainVerticle extends AbstractVerticle {
     private void handleActors(RoutingContext context) {
         String token = context.request().getParam("token");
 
-        SM_USER user = MongoDbProvider.getUser(token);
-
-        if (user == null) {
-            sendBadUserTokenError(context.response());
+        if (!validToken(token)) {
+            sendBadTokenError(context.response());
             return;
         }
 
@@ -323,10 +309,8 @@ public class MainVerticle extends AbstractVerticle {
     private void handleActor(RoutingContext context) {
         String token = context.request().getParam("token");
 
-        SM_USER user = MongoDbProvider.getUser(token);
-
-        if (user == null) {
-            sendBadUserTokenError(context.response());
+        if (!validToken(token)) {
+            sendBadTokenError(context.response());
             return;
         }
 
@@ -345,7 +329,7 @@ public class MainVerticle extends AbstractVerticle {
         SM_INTEGRATOR integrator = MongoDbProvider.getIntegrator(token);
 
         if (integrator == null) {
-            sendBadIntegratorTokenError(context.response());
+            sendBadTokenError(context.response());
             return;
         }
 
@@ -353,5 +337,23 @@ public class MainVerticle extends AbstractVerticle {
         MongoDbProvider.deleteActor(actorId);
 
         context.response().end(Json.encodePrettily(new BasicResult(1, "Actor deleted")));
+    }
+
+    // HISTORY
+
+    private void handleHistory(RoutingContext context) {
+
+//        String token = context.request().getParam("token");
+//        SM_INTEGRATOR integrator = MongoDbProvider.getIntegrator(token);
+//
+//        if (integrator == null) {
+//            sendBadIntegratorTokenError(context.response());
+//            return;
+//        }
+//
+//        String actorId = context.request().getParam("actorId");
+//        MongoDbProvider.deleteActor(actorId);
+//
+//        context.response().end(Json.encodePrettily(new BasicResult(1, "Actor deleted")));
     }
 }

@@ -11,11 +11,11 @@ public class AuthResult implements Serializable {
         super();
     }
 
-    public AuthResult(String login, String password, boolean isIntegrator) {
+    public AuthResult(String token, String login, String password, boolean isIntegrator) {
+        this.token = token;
         this.login = login;
         this.password = password;
         this.isIntegrator = isIntegrator;
-        token = generateToken();
     }
 
     public boolean isIntegrator() {
