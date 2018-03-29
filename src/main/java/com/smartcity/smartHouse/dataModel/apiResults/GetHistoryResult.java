@@ -6,12 +6,12 @@ import com.smartcity.smartHouse.dataModel.Storage.SM_HOUSE;
 import java.io.Serializable;
 
 public class GetHistoryResult implements Serializable {
-    private String houseId, time, event;
+    private String houseId, time, eventString;
 
     public GetHistoryResult(SM_HISTORY history) {
         houseId = history.houseId;
         time = history.time;
-        event = history.eventString;
+        eventString = history.eventString;
     }
 
     public String getHouseId() {
@@ -24,6 +24,6 @@ public class GetHistoryResult implements Serializable {
     public String getTime() { return time; }
     public void setTime(String id) { this.time = time; }
 
-    public String getEvent() { return event; }
-    public void setEvent(String event) { this.event = event; }
+    public String getEventString() { return eventString; }
+    public void setEventString(String event) { this.eventString = event; }
 }

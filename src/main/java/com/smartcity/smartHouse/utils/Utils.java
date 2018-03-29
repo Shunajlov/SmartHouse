@@ -1,11 +1,10 @@
 package com.smartcity.smartHouse.utils;
 
-import com.smartcity.smartHouse.Const;
-//import com.smartcity.smartHouse.dataModel.apiResults.AuthResult;
-//import com.smartcity.smartHouse.dataModel.apiResults.AuthRoomerResult;
-
-import java.util.Map;
+import java.util.UUID;
 
 public class Utils {
 
+    public static String generateToken() {
+        return UUID.randomUUID().toString();
+    }
 }

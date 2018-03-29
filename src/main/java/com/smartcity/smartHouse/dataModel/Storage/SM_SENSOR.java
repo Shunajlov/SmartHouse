@@ -14,6 +14,7 @@ public class SM_SENSOR extends BaseEntity {
     public String fieldName;       // Название датчика в таблице
     public Boolean active = false;
     public Integer value;
+    public Integer extreme;
     public SensorType sensorType;
 
     public SensorBase sensor() {
@@ -26,6 +27,7 @@ public class SM_SENSOR extends BaseEntity {
             sensor.active = active;
             sensor.type = sensorType;
             sensor.value = value;
+            sensor.extreme = extreme;
             return sensor;
         } else {
             SensorDiscrete sensor = new SensorDiscrete();
@@ -36,6 +38,7 @@ public class SM_SENSOR extends BaseEntity {
             sensor.active = this.active;
             sensor.type = sensorType;
             sensor.value = (value == 1) ? true : false;
+            sensor.extreme = extreme;
             return sensor;
         }
     }

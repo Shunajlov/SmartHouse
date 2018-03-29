@@ -31,6 +31,43 @@ public class MongoDbProvider {
         datastore = morphia.createDatastore(mongoClient, dbName);
     }
 
+    // SM_ADMIN
+
+    public static SM_ADMIN getAdmin(String login, String password) {
+
+        final List<SM_ADMIN> admins = datastore.createQuery(SM_ADMIN.class)
+            .field("login").equal(login)
+            .field("password").equal(password)
+            .asList();
+
+        if (admins == null || admins.isEmpty()) {
+            System.out.println("Admin with login: " + login +  " password: " + password + " not exist in database");
+            return null;
+        } else {
+            SM_ADMIN admin = admins.get(0);
+            System.out.println("Admin with login: " + login +  " password: " + password + " exists in database");
+            return admin;
+        }
+    }
+
+    public static SM_ADMIN getAdmin(String token) {
+
+        final List<SM_ADMIN> admins = datastore.createQuery(SM_ADMIN.class)
+            .field("token").equal(token)
+            .asList();
+
+        if (admins == null || admins.isEmpty()) {
+            System.out.println("Integrator with token: " + token + " not exist in database");
+            return null;
+        } else {
+            SM_ADMIN admin = admins.get(0);
+            System.out.println("Integrator with token: " + token + " exists in database");
+            return admin;
+        }
+    }
+
+    public static void saveAdmin(SM_ADMIN admin) { datastore.save(admin); }
+
     // SM_INTEGRATOR
 
     public static SM_INTEGRATOR getIntegrator(String login, String password) {
@@ -62,6 +99,22 @@ public class MongoDbProvider {
         } else {
             SM_INTEGRATOR integrator = integrators.get(0);
             System.out.println("Integrator with token: " + token + " exists in database");
+            return integrator;
+        }
+    }
+
+    public static SM_INTEGRATOR getIntegratorWithLogin(String login) {
+
+        final List<SM_INTEGRATOR> integrators = datastore.createQuery(SM_INTEGRATOR.class)
+            .field("login").equal(login)
+            .asList();
+
+        if (integrators == null || integrators.isEmpty()) {
+            System.out.println("No users");
+            return null;
+        } else {
+            SM_INTEGRATOR integrator = integrators.get(0);
+            System.out.println("Users count: " + integrators.size());
             return integrator;
         }
     }
@@ -156,7 +209,7 @@ public class MongoDbProvider {
     public static SM_HOUSE getHouse(String id) {
 
         final List<SM_HOUSE> houses = datastore.createQuery(SM_HOUSE.class)
-            .field("id").equal(id)
+            .field("id").equal(new ObjectId(id))
             .asList();
 
         if (houses == null || houses.isEmpty()) {
@@ -180,6 +233,20 @@ public class MongoDbProvider {
         } else {
             System.out.println("Houses count: " + houses.size());
             return houses;
+        }
+    }
+
+    public static void deleteHouse(String houseId) {
+        final List<SM_HOUSE> houses = datastore.createQuery(SM_HOUSE.class)
+            .field("_id").equal(new ObjectId(houseId))
+            .asList();
+
+        if (houses == null || houses.isEmpty()) {
+            System.out.println("No such house");
+        } else {
+            SM_HOUSE house = houses.get(0);
+            datastore.delete(house);
+            System.out.println("House deleted: " + house.getId().toString());
         }
     }
 
@@ -212,7 +279,7 @@ public class MongoDbProvider {
             System.out.println("No actors");
             return null;
         } else {
-            System.out.println("Actors count" + actors.size());
+            System.out.println("Actors count: " + actors.size());
             return actors;
         }
     }
@@ -226,7 +293,7 @@ public class MongoDbProvider {
             System.out.println("No actors");
             return null;
         } else {
-            System.out.println("Actors count" + actors.size());
+            System.out.println("Actors count: " + actors.size());
             return actors;
         }
     }
@@ -276,7 +343,7 @@ public class MongoDbProvider {
             System.out.println("No sensors");
             return null;
         } else {
-            System.out.println("Sensors count" + sensors.size());
+            System.out.println("Sensors count: " + sensors.size());
             return sensors;
         }
     }
@@ -291,7 +358,7 @@ public class MongoDbProvider {
             System.out.println("No sensors");
             return null;
         } else {
-            System.out.println("Sensors count" + sensors.size());
+            System.out.println("Sensors count: " + sensors.size());
             return sensors;
         }
     }
@@ -327,7 +394,7 @@ public class MongoDbProvider {
             System.out.println("No history");
             return null;
         } else {
-            System.out.println("History count" + historyList.size());
+            System.out.println("History count: " + historyList.size());
             return historyList;
         }
     }

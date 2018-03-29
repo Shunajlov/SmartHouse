@@ -12,15 +12,17 @@ public class GetSensorResult implements Serializable {
     public String fieldName;       // Название датчика в таблице
     public Boolean active = false;
     public Integer value;
+    public Integer extreme;
     public SensorType sensorType;
 
     public GetSensorResult(SM_SENSOR sensor) {
-        this.id = sensor.getId().toString();
-        this.houseId = sensor.houseId;
-        this.measurment = sensor.measurment;
-        this.fieldName = sensor.fieldName;
-        this.active = sensor.active;
-        this.value = sensor.value;
-        this.sensorType = sensor.sensorType;
+        id = sensor.getId().toString();
+        houseId = sensor.houseId;
+        measurment = sensor.measurment;
+        fieldName = sensor.fieldName;
+        active = sensor.active;
+        value = sensor.value;
+        extreme = sensor.extreme;
+        sensorType = sensor.sensorType;
     }
 }

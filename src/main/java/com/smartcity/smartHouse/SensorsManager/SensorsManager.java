@@ -166,7 +166,7 @@ public class SensorsManager {
         SM_SENSOR tempGost = new SM_SENSOR();
         tempGost.houseId = house.getId().toString();
         tempGost.measurment = house.name;
-        tempGost.fieldName = "Температура в гостинной";
+        tempGost.fieldName = "Temperatura v gostinoy";
         tempGost.value = 21;
         tempGost.sensorType = SensorType.ANALOG;
         MongoDbProvider.saveSensor(tempGost);
@@ -176,7 +176,7 @@ public class SensorsManager {
         SM_SENSOR vlazhGost = new SM_SENSOR();
         vlazhGost.houseId = house.getId().toString();
         vlazhGost.measurment = house.name;
-        vlazhGost.fieldName = "Влажность в гостинной";
+        vlazhGost.fieldName = "Vlazhnost v gostinoy";
         vlazhGost.value = 55;
         vlazhGost.sensorType = SensorType.ANALOG;
         MongoDbProvider.saveSensor(vlazhGost);
@@ -186,7 +186,7 @@ public class SensorsManager {
         SM_SENSOR dimKuhn = new SM_SENSOR();
         dimKuhn.houseId = house.getId().toString();
         dimKuhn.measurment = house.name;
-        dimKuhn.fieldName = "Дым на кухне";
+        dimKuhn.fieldName = "Dim na kuhne";
         dimKuhn.value = 0;
         dimKuhn.sensorType = SensorType.DISCRETE;
         MongoDbProvider.saveSensor(dimKuhn);
@@ -196,7 +196,7 @@ public class SensorsManager {
         SM_SENSOR vhDver = new SM_SENSOR();
         vhDver.houseId = house.getId().toString();
         vhDver.measurment = house.name;
-        vhDver.fieldName = "Входная дверь";
+        vhDver.fieldName = "Vhodnaya dver";
         vhDver.value = 0;
         vhDver.sensorType = SensorType.DISCRETE;
         MongoDbProvider.saveSensor(vhDver);
@@ -206,7 +206,7 @@ public class SensorsManager {
         SM_SENSOR oknoKuhn = new SM_SENSOR();
         oknoKuhn.houseId = house.getId().toString();
         oknoKuhn.measurment = house.name;
-        oknoKuhn.fieldName = "Окно на кухне";
+        oknoKuhn.fieldName = "Okno na kuhne";
         oknoKuhn.value = 0;
         oknoKuhn.sensorType = SensorType.DISCRETE;
         MongoDbProvider.saveSensor(oknoKuhn);
@@ -216,7 +216,7 @@ public class SensorsManager {
         SM_SENSOR rozKuhn = new SM_SENSOR();
         rozKuhn.houseId = house.getId().toString();
         rozKuhn.measurment = house.name;
-        rozKuhn.fieldName = "Розетка на кухне";
+        rozKuhn.fieldName = "Rozetka na kuhne";
         rozKuhn.value = 0;
         rozKuhn.sensorType = SensorType.DISCRETE;
         MongoDbProvider.saveSensor(rozKuhn);
@@ -226,7 +226,7 @@ public class SensorsManager {
         SM_SENSOR svetGost = new SM_SENSOR();
         svetGost.houseId = house.getId().toString();
         svetGost.measurment = house.name;
-        svetGost.fieldName = "Выключатель света в гостиной";
+        svetGost.fieldName = "Vikluchatel sveta v gostinoy";
         svetGost.value = 0;
         svetGost.sensorType = SensorType.DISCRETE;
         MongoDbProvider.saveSensor(svetGost);
@@ -236,7 +236,7 @@ public class SensorsManager {
         SM_SENSOR waterWarm = new SM_SENSOR();
         waterWarm.houseId = house.getId().toString();
         waterWarm.measurment = house.name;
-        waterWarm.fieldName = "Счетчик горячей воды";
+        waterWarm.fieldName = "Schetchik goryachei vodi";
         waterWarm.value = 305;
         waterWarm.sensorType = SensorType.ANALOG;
         MongoDbProvider.saveSensor(waterWarm);
@@ -246,7 +246,7 @@ public class SensorsManager {
         SM_SENSOR waterCold = new SM_SENSOR();
         waterCold.houseId = house.getId().toString();
         waterCold.measurment = house.name;
-        waterCold.fieldName = "Счетчик холодной воды";
+        waterCold.fieldName = "Schetchik holodnoy vodi";
         waterCold.value = 150;
         waterCold.sensorType = SensorType.ANALOG;
         MongoDbProvider.saveSensor(waterCold);
@@ -256,7 +256,7 @@ public class SensorsManager {
         SM_SENSOR dvizhPrih = new SM_SENSOR();
         dvizhPrih.houseId = house.getId().toString();
         dvizhPrih.measurment = house.name;
-        dvizhPrih.fieldName = "Датчик движения в прихожей";
+        dvizhPrih.fieldName = "Datchik dvijenia d prihojey";
         dvizhPrih.value = 30;
         dvizhPrih.sensorType = SensorType.ANALOG;
         MongoDbProvider.saveSensor(dvizhPrih);
@@ -268,7 +268,7 @@ public class SensorsManager {
         SM_ACTOR condition = new SM_ACTOR();
         condition.houseId = house.getId().toString();
         condition.measurment = house.name;
-        condition.fieldName = "Кондиционер";
+        condition.fieldName = "Condicioner";
         condition.value = 15;
         condition.actorType = ActorType.DISCRETE;
         MongoDbProvider.saveActor(condition);
@@ -278,7 +278,7 @@ public class SensorsManager {
         SM_ACTOR rozet = new SM_ACTOR();
         rozet.houseId = house.getId().toString();
         rozet.measurment = house.name;
-        rozet.fieldName = "Выключатель";
+        rozet.fieldName = "Vikluchatel";
         rozet.value = 0;
         rozet.actorType = ActorType.ANALOG;
         MongoDbProvider.saveActor(rozet);
@@ -288,7 +288,7 @@ public class SensorsManager {
         SM_ACTOR yarkSvet = new SM_ACTOR();
         yarkSvet.houseId = house.getId().toString();
         yarkSvet.measurment = house.name;
-        yarkSvet.fieldName = "Регулятор яркости света";
+        yarkSvet.fieldName = "Regulator yarkosti sveta";
         yarkSvet.value = 10;
         yarkSvet.actorType = ActorType.DISCRETE;
         MongoDbProvider.saveActor(yarkSvet);
@@ -298,7 +298,7 @@ public class SensorsManager {
         SM_ACTOR tepPolVann = new SM_ACTOR();
         tepPolVann.houseId = house.getId().toString();
         tepPolVann.measurment = house.name;
-        tepPolVann.fieldName = "Теплый пол в ванной";
+        tepPolVann.fieldName = "Tepliy pol v vannoy";
         tepPolVann.value = 15;
         tepPolVann.actorType = ActorType.DISCRETE;
         MongoDbProvider.saveActor(tepPolVann);
@@ -308,7 +308,7 @@ public class SensorsManager {
         SM_ACTOR zamokVhod = new SM_ACTOR();
         zamokVhod.houseId = house.getId().toString();
         zamokVhod.measurment = house.name;
-        zamokVhod.fieldName = "Замок входной двери";
+        zamokVhod.fieldName = "Zamok vhodnoy dveri";
         zamokVhod.value = 0;
         zamokVhod.actorType = ActorType.ANALOG;
         MongoDbProvider.saveActor(zamokVhod);
@@ -318,7 +318,7 @@ public class SensorsManager {
         SM_ACTOR videoVhod = new SM_ACTOR();
         videoVhod.houseId = house.getId().toString();
         videoVhod.measurment = house.name;
-        videoVhod.fieldName = "Видеокамера у входной двери";
+        videoVhod.fieldName = "Videokamera y vhodnoy dveri";
         videoVhod.value = 0;
         videoVhod.actorType = ActorType.ANALOG;
         MongoDbProvider.saveActor(videoVhod);
@@ -328,7 +328,7 @@ public class SensorsManager {
         SM_ACTOR vitazhKuhn = new SM_ACTOR();
         vitazhKuhn.houseId = house.getId().toString();
         vitazhKuhn.measurment = house.name;
-        vitazhKuhn.fieldName = "Вытяжка на кухне";
+        vitazhKuhn.fieldName = "Vitazhka na kuhne";
         vitazhKuhn.value = 0;
         vitazhKuhn.actorType = ActorType.ANALOG;
         MongoDbProvider.saveActor(vitazhKuhn);
@@ -338,7 +338,7 @@ public class SensorsManager {
         SM_ACTOR kranVann = new SM_ACTOR();
         kranVann.houseId = house.getId().toString();
         kranVann.measurment = house.name;
-        kranVann.fieldName = "Кран в ванной";
+        kranVann.fieldName = "Kran v vannoy";
         kranVann.value = 0;
         kranVann.actorType = ActorType.ANALOG;
         MongoDbProvider.saveActor(kranVann);
@@ -348,7 +348,7 @@ public class SensorsManager {
         SM_ACTOR signal = new SM_ACTOR();
         signal.houseId = house.getId().toString();
         signal.measurment = house.name;
-        signal.fieldName = "Сигнализация";
+        signal.fieldName = "Signalizacia";
         signal.value = 0;
         signal.actorType = ActorType.ANALOG;
         MongoDbProvider.saveActor(signal);
@@ -358,7 +358,7 @@ public class SensorsManager {
         SM_ACTOR pozharTrev = new SM_ACTOR();
         pozharTrev.houseId = house.getId().toString();
         pozharTrev.measurment = house.name;
-        pozharTrev.fieldName = "Пожарная тревога";
+        pozharTrev.fieldName = "Pozharnaya trevoga";
         pozharTrev.value = 0;
         pozharTrev.actorType = ActorType.ANALOG;
         MongoDbProvider.saveActor(pozharTrev);

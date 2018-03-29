@@ -9,6 +9,7 @@ public class SensorBase {
     public String measurment = "";      // Идентификатор дома (таблицы)
     public String fieldName = "";       // Название датчика в таблице
     public Boolean active = false;
+    public Integer extreme;
 
     public Timer timer = new Timer();
     public SensorType type = SensorType.ANALOG;

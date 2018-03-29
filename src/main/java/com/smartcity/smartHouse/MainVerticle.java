@@ -1,8 +1,11 @@
 package com.smartcity.smartHouse;
 
+import com.smartcity.smartHouse.SensorsManager.Actors.ActorType;
+import com.smartcity.smartHouse.SensorsManager.Sensors.SensorType;
 import com.smartcity.smartHouse.dataModel.Storage.*;
 import com.smartcity.smartHouse.dataModel.apiResults.*;
 import com.smartcity.smartHouse.db.MongoDbProvider;
+import com.smartcity.smartHouse.utils.Utils;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Future;
 import io.vertx.core.http.HttpMethod;
@@ -57,19 +60,25 @@ public class MainVerticle extends AbstractVerticle {
         router.get(Const.TEST).handler(this::handleTestMethod);
         router.get(Const.AUTH).handler(this::handleAuth);
 
+        router.post(Const.INTEGRATOR_ADD).handler(this::handleIntegratorAdd);
+
+        router.get(Const.USERS_LIST).handler(this::handleListUsers);
         router.post(Const.USER_ADD).handler(this::handleUserAdd);
         router.post(Const.USER_DELETE).handler(this::handleUserDelete);
-        router.get(Const.USERS_LIST).handler(this::handleListUsers);
 
         router.get(Const.HOUSES_LIST).handler(this::handleListHouses);
+        router.post(Const.HOUSE_ADD).handler(this::handleHouseAdd);
+        router.post(Const.HOUSE_DELETE).handler(this::handleHouseDelete);
 
         router.get(Const.SENSORS_LIST).handler(this::handleListSensors);
         router.get(Const.SENSOR).handler(this::handleSensor);
-        router.get(Const.SENSOR_DELETE).handler(this::handleSensorDelete);
+        router.post(Const.SENSOR_ADD).handler(this::handleSensorAdd);
+        router.post(Const.SENSOR_DELETE).handler(this::handleSensorDelete);
 
         router.get(Const.ACTORS_LIST).handler(this::handleActors);
         router.get(Const.ACTOR).handler(this::handleActor);
-        router.get(Const.ACTOR_DELETE).handler(this::handleActorDelete);
+        router.post(Const.ACTOR_ADD).handler(this::handleActorAdd);
+        router.post(Const.ACTOR_DELETE).handler(this::handleActorDelete);
 
         router.get(Const.HISTORY_LIST).handler(this::handleHistory);
     }
@@ -106,11 +115,41 @@ public class MainVerticle extends AbstractVerticle {
         MongoDbProvider.saveHistory(history);
     }
 
+    // INTEGRATOR
+
+    private void handleIntegratorAdd(RoutingContext context) {
+        String token = context.request().getParam("token");
+
+        SM_ADMIN admin = MongoDbProvider.getAdmin(token);
+
+        if (admin == null) {
+            sendBadTokenError(context.response());
+            return;
+        }
+
+        String login = context.request().getParam("login");
+
+        SM_INTEGRATOR integratorWithLogin = MongoDbProvider.getIntegratorWithLogin(login);
+
+        if (integratorWithLogin != null) {
+            sendError(401, context.response(), Json.encodePrettily(new BasicResult(1, "Login exists")));
+            return;
+        }
+
+        SM_INTEGRATOR integrator = new SM_INTEGRATOR();
+
+        integrator.login = login;
+        integrator.password = context.request().getParam("password");
+        integrator.token = Utils.generateToken();
+
+        MongoDbProvider.saveIntegrator(integrator);
+
+        AuthIntegratorResult result = new AuthIntegratorResult(integrator);
+        context.response().end(Json.encodePrettily(result));
+    }
+
     // USER
 
-    /**
-     * Авторизация
-     */
     private void handleAuth(RoutingContext context) {
         String login = context.request().getParam("login");
         String password = context.request().getParam("password");
@@ -239,6 +278,50 @@ public class MainVerticle extends AbstractVerticle {
         }
     }
 
+    private void handleHouseAdd(RoutingContext context) {
+        String token = context.request().getParam("token");
+
+        SM_INTEGRATOR integrator = MongoDbProvider.getIntegrator(token);
+
+        if (integrator == null) {
+            sendBadTokenError(context.response());
+            return;
+        }
+
+        String name = context.request().getParam("name");
+
+        SM_HOUSE house = new SM_HOUSE();
+        house.name = name;
+
+        MongoDbProvider.saveHouse(house);
+
+        makeHistory(house.getId().toString(), "House added, id: " + house.getId().toString());
+        context.response().end(Json.encodePrettily(new GetHouseResult(house)));
+    }
+
+    private void handleHouseDelete(RoutingContext context) {
+        String token = context.request().getParam("token");
+
+        SM_INTEGRATOR integrator = MongoDbProvider.getIntegrator(token);
+
+        if (integrator == null) {
+            sendBadTokenError(context.response());
+            return;
+        }
+
+        String houseId = context.request().getParam("houseId");
+
+        SM_HOUSE house = MongoDbProvider.getHouse(houseId);
+
+        MongoDbProvider.deleteHouse(houseId);
+
+        context.response().end(Json.encodePrettily(new BasicResult(1, "House deleted")));
+
+        if (house != null) {
+            makeHistory(house.getId().toString(), "House deleted, id: " + house.getId().toString());
+        }
+    }
+
     // SENSORS
 
     private void handleListSensors(RoutingContext context) {
@@ -281,6 +364,40 @@ public class MainVerticle extends AbstractVerticle {
         } else {
             context.response().end(Json.encodePrettily(new GetSensorResult(sensor)));
         }
+    }
+
+    private void handleSensorAdd(RoutingContext context) {
+        String token = context.request().getParam("token");
+
+        SM_INTEGRATOR integrator = MongoDbProvider.getIntegrator(token);
+
+        if (integrator == null) {
+            sendBadTokenError(context.response());
+            return;
+        }
+
+        String houseId = context.request().getParam("houseId");
+        String extreme = context.request().getParam("extreme");
+        String fieldName = context.request().getParam("fieldName");
+        String sensorType = context.request().getParam("sensorType");
+
+        SM_SENSOR sensor = new SM_SENSOR();
+        sensor.houseId = houseId;
+        SM_HOUSE house = MongoDbProvider.getHouse(houseId);
+        if (house != null) {
+            sensor.measurment = house.name;
+        } else {
+            sendError(401, context.response(), Json.encodePrettily(new BasicResult(1, "No such house")));
+            return;
+        }
+        sensor.fieldName = fieldName;
+        sensor.sensorType = SensorType.valueOf(sensorType);
+        sensor.extreme = Integer.parseInt(extreme);
+
+        MongoDbProvider.saveSensor(sensor);
+
+        makeHistory(sensor.houseId, "Sensor added, id: " + sensor.getId().toString());
+        context.response().end(Json.encodePrettily(new GetSensorResult(sensor)));
     }
 
     private void handleSensorDelete(RoutingContext context) {
@@ -348,6 +465,39 @@ public class MainVerticle extends AbstractVerticle {
         } else {
             context.response().end(Json.encodePrettily(new GetActorResult(actor)));
         }
+    }
+
+    private void handleActorAdd(RoutingContext context) {
+        String token = context.request().getParam("token");
+
+        SM_INTEGRATOR integrator = MongoDbProvider.getIntegrator(token);
+
+        if (integrator == null) {
+            sendBadTokenError(context.response());
+            return;
+        }
+
+        String houseId = context.request().getParam("houseId");
+        String fieldName = context.request().getParam("fieldName");
+        String actorType = context.request().getParam("actorType");
+
+        SM_ACTOR actor = new SM_ACTOR();
+        actor.houseId = houseId;
+        SM_HOUSE house = MongoDbProvider.getHouse(houseId);
+        if (house != null) {
+            actor.measurment = house.name;
+        } else {
+            sendError(401, context.response(), Json.encodePrettily(new BasicResult(1, "No such house")));
+            return;
+        }
+        actor.fieldName = fieldName;
+        actor.actorType = ActorType.valueOf(actorType);
+        actor.value = 0;
+
+        MongoDbProvider.saveActor(actor);
+
+        makeHistory(actor.houseId, "Actor added, id: " + actor.getId().toString());
+        context.response().end(Json.encodePrettily(new GetActorResult(actor)));
     }
 
     private void handleActorDelete(RoutingContext context) {
