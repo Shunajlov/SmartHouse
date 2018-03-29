@@ -67,8 +67,13 @@ public class Const {
      */
     public static final String USERS_LIST = "/api/users/:houseId/:token";
 
-
     public static final String HOUSES_LIST = "/api/houses/:token";
 
+    public static final String SENSORS_LIST = "/api/sensors/:houseId/:token";
+    public static final String SENSOR = "/api/sensor/:sensorId/:token";
+    public static final String SENSOR_DELETE = "/api/sensorDelete/:sensorId/:token";
 
+    public static final String ACTORS_LIST = "/api/actors/:actorId/:token";
+    public static final String ACTOR = "/api/sensor/:actorId/:token";
+    public static final String ACTOR_DELETE = "/api/actorDelete/:sensorId/:token";
 }

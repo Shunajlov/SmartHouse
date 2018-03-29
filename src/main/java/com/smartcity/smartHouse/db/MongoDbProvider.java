@@ -3,6 +3,7 @@ package com.smartcity.smartHouse.db;
 import com.smartcity.smartHouse.dataModel.Storage.*;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoClientURI;
+import org.bson.types.ObjectId;
 import org.mongodb.morphia.Datastore;
 import org.mongodb.morphia.Morphia;
 
@@ -39,7 +40,7 @@ public class MongoDbProvider {
             .field("password").equal(password)
             .asList();
 
-        if (integrators.isEmpty()) {
+        if (integrators == null || integrators.isEmpty()) {
             System.out.println("Such integrator not exist in database");
             return null;
         } else {
@@ -55,7 +56,7 @@ public class MongoDbProvider {
             .field("token").equal(token)
             .asList();
 
-        if (integrators.isEmpty()) {
+        if (integrators == null || integrators.isEmpty()) {
             System.out.println("Such integrator not exist in database");
             return null;
         } else {
@@ -76,12 +77,28 @@ public class MongoDbProvider {
             .field("password").equal(password)
             .asList();
 
-        if (users.isEmpty()) {
+        if (users == null || users.isEmpty()) {
             System.out.println("User with login: " + login +  " password: " + password + " not exist in database");
             return null;
         } else {
             SM_USER user = users.get(0);
             System.out.println("User with login: " + login +  " password: " + password + " exist in database");
+            return user;
+        }
+    }
+
+    public static SM_USER getUser(String token) {
+
+        final List<SM_USER> users = datastore.createQuery(SM_USER.class)
+            .field("token").equal(token)
+            .asList();
+
+        if (users == null || users.isEmpty()) {
+            System.out.println("User with token: " + token +  " not exist in database");
+            return null;
+        } else {
+            SM_USER user = users.get(0);
+            System.out.println("User with token: " + token +  " exist in database");
             return user;
         }
     }
@@ -92,7 +109,7 @@ public class MongoDbProvider {
             .field("houseId").equal(houseId)
             .asList();
 
-        if (users.isEmpty()) {
+        if (users == null || users.isEmpty()) {
             System.out.println("No users");
             return null;
         } else {
@@ -107,7 +124,7 @@ public class MongoDbProvider {
             .field("login").equal(login)
             .asList();
 
-        if (users.isEmpty()) {
+        if (users == null || users.isEmpty()) {
             System.out.println("No users");
             return null;
         } else {
@@ -122,7 +139,7 @@ public class MongoDbProvider {
             .field("login").equal(login)
             .asList();
 
-        if (users.isEmpty()) {
+        if (users == null || users.isEmpty()) {
             System.out.println("No users");
         } else {
             SM_USER user = users.get(0);
@@ -141,7 +158,7 @@ public class MongoDbProvider {
             .field("id").equal(id)
             .asList();
 
-        if (houses.isEmpty()) {
+        if (houses == null || houses.isEmpty()) {
             System.out.println("User with id: " + id + " not exist in database");
             return null;
         } else {
@@ -156,7 +173,7 @@ public class MongoDbProvider {
         final List<SM_HOUSE> houses = datastore.createQuery(SM_HOUSE.class)
             .asList();
 
-        if (houses.isEmpty()) {
+        if (houses == null || houses.isEmpty()) {
             System.out.println("No houses");
             return null;
         } else {
@@ -167,127 +184,120 @@ public class MongoDbProvider {
 
     public static void saveHouse(SM_HOUSE house) { datastore.save(house); }
 
-//    // SM_ACTOR
-//
-//    public static SM_ACTOR getActor(String actorId) {
-//
-//        final List<SM_ACTOR> actors = datastore.createQuery(SM_ACTOR.class)
-//            .field("actorId").equal(actorId)
-//            .asList();
-//
-//        if (actors.isEmpty()) {
-//            System.out.println("Actor with id: " + actorId.toString() +  " not exist in database");
-//            return null;
-//        } else {
-//            SM_ACTOR actor = actors.get(0);
-//            System.out.println("Actor with id: " + actorId.toString() + " exists in database");
-//            return actor;
-//        }
-//    }
-//
-//    public static List<SM_ACTOR> getAllActors() {
-//
-//        final List<SM_ACTOR> actors = datastore.createQuery(SM_ACTOR.class)
-//            .asList();
-//
-//        if (actors.isEmpty()) {
-//            System.out.println("No actors");
-//            return null;
-//        } else {
-//            System.out.println("Actors count" + actors.size());
-//            return actors;
-//        }
-//    }
-//
-//    public static List<SM_ACTOR> getActors(String houseId) {
-//
-//        final List<SM_ACTOR> actors = datastore.createQuery(SM_ACTOR.class)
-//            .field("houseId").equal(houseId)
-//            .asList();
-//
-//        if (actors.isEmpty()) {
-//            System.out.println("No actors");
-//            return null;
-//        } else {
-//            System.out.println("Actors count" + actors.size());
-//            return actors;
-//        }
-//    }
-//
-//    public static void saveActor(SM_ACTOR actor) {
-//        datastore.save(actor);
-//    }
-//
-//    // SM_HOUSE
-//
-//    public static SM_HOUSE getHouse(String houseId) {
-//
-//        final List<SM_HOUSE> houses = datastore.createQuery(SM_HOUSE.class)
-//            .field("houseId").equal(houseId)
-//            .asList();
-//
-//        if (houses.isEmpty()) {
-//            System.out.println("House with id: " + houseId.toString() +  " not exist in database");
-//            return null;
-//        } else {
-//            SM_HOUSE house = houses.get(0);
-//            System.out.println("House with id: " + houseId.toString() + " exists in database");
-//            return house;
-//        }
-//    }
-//
-//    public static void saveHouse(SM_HOUSE house) {
-//        datastore.save(house);
-//    }
-//
-//    // SM_SENSOR
-//
-//    static public SM_SENSOR getSensor(String sensorId) {
-//
-//        final List<SM_SENSOR> sensors = datastore.createQuery(SM_SENSOR.class)
-//            .field("sendorId").equal(sensorId)
-//            .asList();
-//
-//        if (sensors.isEmpty()) {
-//            System.out.println("Sensor with id: " + sensorId.toString() +  " not exist in database");
-//            return null;
-//        } else {
-//            SM_SENSOR sensor = sensors.get(0);
-//            System.out.println("Sensor with id: " + sensorId.toString() + " exists in database");
-//            return sensor;
-//        }
-//    }
-//
-//    public static List<SM_SENSOR> getAllSensors() {
-//
-//        final List<SM_SENSOR> sensors = datastore.createQuery(SM_SENSOR.class)
-//            .asList();
-//
-//        if (sensors.isEmpty()) {
-//            System.out.println("No sensors");
-//            return null;
-//        } else {
-//            System.out.println("Sensors count" + sensors.size());
-//            return sensors;
-//        }
-//    }
-//
-//    public static List<SM_SENSOR> getSensors(String houseId) {
-//
-//        final List<SM_SENSOR> sensors = datastore.createQuery(SM_SENSOR.class)
-//            .field("houseId").equal(houseId)
-//            .asList();
-//
-//        if (sensors.isEmpty()) {
-//            System.out.println("No sensors");
-//            return null;
-//        } else {
-//            System.out.println("Sensors count" + sensors.size());
-//            return sensors;
-//        }
-//    }
+    // SM_ACTOR
 
-//    public static void saveSensor(SM_SENSOR sensor) {
-//        datastore.save(sensor);
-//    }
+    public static SM_ACTOR getActor(String actorId) {
+
+        final List<SM_ACTOR> actors = datastore.createQuery(SM_ACTOR.class)
+            .field("actorId").equal(actorId)
+            .asList();
+
+        if (actors == null || actors.isEmpty()) {
+            System.out.println("Actor with id: " + actorId.toString() +  " not exist in database");
+            return null;
+        } else {
+            SM_ACTOR actor = actors.get(0);
+            System.out.println("Actor with id: " + actorId.toString() + " exists in database");
+            return actor;
+        }
+    }
+
+    public static List<SM_ACTOR> getAllActors() {
+
+        final List<SM_ACTOR> actors = datastore.createQuery(SM_ACTOR.class)
+            .asList();
+
+        if (actors == null || actors.isEmpty()) {
+            System.out.println("No actors");
+            return null;
+        } else {
+            System.out.println("Actors count" + actors.size());
+            return actors;
+        }
+    }
+
+    public static List<SM_ACTOR> getActors(String houseId) {
+
+        final List<SM_ACTOR> actors = datastore.createQuery(SM_ACTOR.class)
+            .field("houseId").equal(houseId)
+            .asList();
+
+        if (actors == null || actors.isEmpty()) {
+            System.out.println("No actors");
+            return null;
+        } else {
+            System.out.println("Actors count" + actors.size());
+            return actors;
+        }
+    }
+
+    public static void saveActor(SM_ACTOR actor) {
+        datastore.save(actor);
+    }
+
+    // SM_SENSOR
+
+    static public SM_SENSOR getSensor(String sensorId) {
+
+        final List<SM_SENSOR> sensors = datastore.createQuery(SM_SENSOR.class)
+            .field("_id").equal(new ObjectId(sensorId))
+            .asList();
+
+        if (sensors == null || sensors.isEmpty()) {
+            System.out.println("Sensor with id: " + sensorId.toString() +  " not exist in database");
+            return null;
+        } else {
+            SM_SENSOR sensor = sensors.get(0);
+            System.out.println("Sensor with id: " + sensorId.toString() + " exists in database");
+            return sensor;
+        }
+    }
+
+    public static List<SM_SENSOR> getAllSensors() {
+
+        final List<SM_SENSOR> sensors = datastore.createQuery(SM_SENSOR.class)
+            .asList();
+
+        if (sensors == null || sensors.isEmpty()) {
+            System.out.println("No sensors");
+            return null;
+        } else {
+            System.out.println("Sensors count" + sensors.size());
+            return sensors;
+        }
+    }
+
+    public static List<SM_SENSOR> getSensors(String houseId) {
+
+        final List<SM_SENSOR> sensors = datastore.createQuery(SM_SENSOR.class)
+            .field("houseId").equal(houseId)
+            .asList();
+
+        if (sensors == null || sensors.isEmpty()) {
+            System.out.println("No sensors");
+            return null;
+        } else {
+            System.out.println("Sensors count" + sensors.size());
+            return sensors;
+        }
+    }
+
+    public static void deleteSensor(String sensorId) {
+
+        final List<SM_SENSOR> sensors = datastore.createQuery(SM_SENSOR.class)
+            .field("_id").equal(new ObjectId(sensorId))
+            .asList();
+
+        if (sensors == null || sensors.isEmpty()) {
+            System.out.println("No such sensor");
+        } else {
+            SM_SENSOR sensor = sensors.get(0);
+            datastore.delete(sensor);
+            System.out.println("Sensor deleted: " + sensor.getId().toString());
+        }
+    }
+
+    public static void saveSensor(SM_SENSOR sensor) {
+        datastore.save(sensor);
+    }
 }

@@ -2,6 +2,7 @@ package com.smartcity.smartHouse;
 
 import com.smartcity.smartHouse.dataModel.Storage.SM_HOUSE;
 import com.smartcity.smartHouse.dataModel.Storage.SM_INTEGRATOR;
+import com.smartcity.smartHouse.dataModel.Storage.SM_SENSOR;
 import com.smartcity.smartHouse.dataModel.Storage.SM_USER;
 import com.smartcity.smartHouse.dataModel.apiResults.*;
 import com.smartcity.smartHouse.db.MongoDbProvider;
@@ -37,13 +38,22 @@ public class MainVerticle extends AbstractVerticle {
         router.route().handler(CorsHandler.create("*")
             .allowedHeaders(allowHeaders)
             .allowedMethods(allowMethods));
+
         // routes
         router.get(Const.TEST).handler(this::handleTestMethod);
         router.get(Const.AUTH).handler(this::handleAuth);
+
         router.post(Const.USER_ADD).handler(this::handleUserAdd);
         router.post(Const.USER_DELETE).handler(this::handleUserDelete);
         router.get(Const.USERS_LIST).handler(this::handleListUsers);
+
         router.get(Const.HOUSES_LIST).handler(this::handleListHouses);
+
+        router.get(Const.SENSORS_LIST).handler(this::handleListSensors);
+        router.get(Const.SENSOR).handler(this::handleSensor);
+        router.get(Const.SENSOR_DELETE).handler(this::handleSensorDelete);
+
+
 
         vertx.createHttpServer()
             .requestHandler(router::accept)
@@ -200,18 +210,84 @@ public class MainVerticle extends AbstractVerticle {
             return;
         }
 
-        ArrayList<GetHouseRequest> houses = new ArrayList<>();
+        ArrayList<GetHouseResult> houses = new ArrayList<>();
 
         List<SM_HOUSE> mongoHouses = MongoDbProvider.getHouses();
 
         if (mongoHouses != null && !mongoHouses.isEmpty()) {
             for (SM_HOUSE house: mongoHouses) {
-                houses.add(new GetHouseRequest(house));
+                houses.add(new GetHouseResult(house));
             }
 
-            context.response().end(Json.encodePrettily(new GetHousesRequest(houses)));
+            context.response().end(Json.encodePrettily(new GetHousesResult(houses)));
         } else {
             sendError(401, context.response(), Json.encodePrettily(new BasicResult(1, "No houses")));
         }
+    }
+
+    // SENSORS
+
+    private void handleListSensors(RoutingContext context) {
+        String token = context.request().getParam("token");
+
+        SM_USER user = MongoDbProvider.getUser(token);
+
+        if (user == null) {
+            sendBadUserTokenError(context.response());
+            return;
+        }
+
+        String houseId = context.request().getParam("houseId");
+        ArrayList<GetSensorResult> sensors = new ArrayList<>();
+
+        List<SM_SENSOR> mongoSensors = MongoDbProvider.getSensors(houseId);
+
+        if (mongoSensors != null && !mongoSensors.isEmpty()) {
+            for (SM_SENSOR sensor: mongoSensors) {
+                sensors.add(new GetSensorResult(sensor));
+            }
+
+            context.response().end(Json.encodePrettily(new GetSensorsResult(sensors)));
+        } else {
+            sendError(401, context.response(), Json.encodePrettily(new BasicResult(1, "No sensors")));
+        }
+    }
+
+    private void handleSensor(RoutingContext context) {
+        String token = context.request().getParam("token");
+
+        SM_USER user = MongoDbProvider.getUser(token);
+
+        if (user == null) {
+            sendBadUserTokenError(context.response());
+            return;
+        }
+
+        String sensorId = context.request().getParam("sensorId");
+
+        SM_SENSOR sensor = MongoDbProvider.getSensor(sensorId);
+
+        if (sensor == null) {
+            sendError(401, context.response(), Json.encodePrettily(new BasicResult(1, "No such sensor")));
+        } else {
+            context.response().end(Json.encodePrettily(new GetSensorResult(sensor)));
+        }
+    }
+
+    private void handleSensorDelete(RoutingContext context) {
+        String token = context.request().getParam("token");
+
+        SM_INTEGRATOR integrator = MongoDbProvider.getIntegrator(token);
+
+        if (integrator == null) {
+            sendBadIntegratorTokenError(context.response());
+            return;
+        }
+
+        String sensorId = context.request().getParam("sensorId");
+
+        MongoDbProvider.deleteSensor(sensorId);
+
+        context.response().end(Json.encodePrettily(new BasicResult(1, "Sensor deleted")));
     }
 }

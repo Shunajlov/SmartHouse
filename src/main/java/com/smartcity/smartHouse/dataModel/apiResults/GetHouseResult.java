@@ -4,10 +4,10 @@ import com.smartcity.smartHouse.dataModel.Storage.SM_HOUSE;
 
 import java.io.Serializable;
 
-public class GetHouseRequest implements Serializable {
+public class GetHouseResult implements Serializable {
     private String id, name;
 
-    public GetHouseRequest(SM_HOUSE house) {
+    public GetHouseResult(SM_HOUSE house) {
         this.id = house.getId().toString();
         this.name = house.name;
     }
