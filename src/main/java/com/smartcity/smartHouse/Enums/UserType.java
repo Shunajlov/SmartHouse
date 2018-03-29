@@ -1,3 +1,3 @@
 package com.smartcity.smartHouse.Enums;
 
-public enum UserType { Base, Simple, Super }
+public enum UserType { BASE, PREMIUM, SUPER }

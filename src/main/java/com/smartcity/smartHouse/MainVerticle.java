@@ -1,6 +1,5 @@
 package com.smartcity.smartHouse;
 
-import com.mongodb.Mongo;
 import com.smartcity.smartHouse.dataModel.Storage.*;
 import com.smartcity.smartHouse.dataModel.apiResults.*;
 import com.smartcity.smartHouse.db.MongoDbProvider;
@@ -39,7 +38,22 @@ public class MainVerticle extends AbstractVerticle {
             .allowedHeaders(allowHeaders)
             .allowedMethods(allowMethods));
 
-        // routes
+        setupRoutes(router);
+
+        vertx.createHttpServer()
+            .requestHandler(router::accept)
+            .listen(Const.PORT, result -> {
+                if (result.succeeded())
+                    future.complete();
+                else
+                    future.fail(result.cause());
+
+            });
+        System.out.println("HTTP server started on port 8080");
+    }
+
+    private void setupRoutes(Router router) {
+
         router.get(Const.TEST).handler(this::handleTestMethod);
         router.get(Const.AUTH).handler(this::handleAuth);
 
@@ -57,16 +71,7 @@ public class MainVerticle extends AbstractVerticle {
         router.get(Const.ACTOR).handler(this::handleActor);
         router.get(Const.ACTOR_DELETE).handler(this::handleActorDelete);
 
-        vertx.createHttpServer()
-            .requestHandler(router::accept)
-            .listen(Const.PORT, result -> {
-                if (result.succeeded())
-                    future.complete();
-                else
-                    future.fail(result.cause());
-
-            });
-        System.out.println("HTTP server started on port 8080");
+        router.get(Const.HISTORY_LIST).handler(this::handleHistory);
     }
 
     private void sendError(int statusCode, HttpServerResponse response, String message) {
@@ -93,6 +98,14 @@ public class MainVerticle extends AbstractVerticle {
         return (user != null || integrator != null);
     }
 
+    private void makeHistory(String houseId, String text) {
+        SM_HISTORY history = new SM_HISTORY();
+        history.houseId = houseId;
+        history.time = new java.util.Date().toString();
+        history.eventString = text;
+        MongoDbProvider.saveHistory(history);
+    }
+
     // USER
 
     /**
@@ -108,10 +121,11 @@ public class MainVerticle extends AbstractVerticle {
         if (user == null && integrator == null) {
             sendError(401, context.response(), Json.encodePrettily(new BasicResult(1, "No such user or integrator")));
         } else if (user == null) { // is SM_INTEGRATOR
-            AuthResult result = new AuthResult(integrator.token, login, password, true);
+            AuthIntegratorResult result = new AuthIntegratorResult(integrator);
             context.response().end(Json.encodePrettily(result));
+            makeHistory(user.houseId,"User auth, login: " + login);
         } else if (integrator == null) { // is SM_USER
-            AuthResult result = new AuthResult(user.token, login, password, false);
+            AuthUserResult result = new AuthUserResult(user);
             context.response().end(Json.encodePrettily(result));
         }
     }
@@ -128,9 +142,9 @@ public class MainVerticle extends AbstractVerticle {
 
         String login = context.request().getParam("login");
 
-        List<SM_USER> usersWithLogin = MongoDbProvider.getUsersWithLogin(login);
+        SM_USER userWithLogin = MongoDbProvider.getUserWithLogin(login);
 
-        if (!(usersWithLogin == null || usersWithLogin.isEmpty())) {
+        if (userWithLogin != null) {
             sendError(401, context.response(), Json.encodePrettily(new BasicResult(1, "Login exists")));
             return;
         }
@@ -141,12 +155,12 @@ public class MainVerticle extends AbstractVerticle {
         user.password = context.request().getParam("password");
         user.houseId = context.request().getParam("houseId");
 
-        AuthUserResult result = new AuthUserResult(user.houseId);
-        result.setLogin(user.login);
-        result.setPassword(user.password);
-
         MongoDbProvider.saveUser(user);
+
+        AuthUserResult result = new AuthUserResult(user);
         context.response().end(Json.encodePrettily(result));
+
+        makeHistory(user.houseId,"User added, login: " + login);
     }
 
     private void handleUserDelete(RoutingContext context) {
@@ -161,9 +175,15 @@ public class MainVerticle extends AbstractVerticle {
 
         String login = context.request().getParam("login");
 
+        SM_USER user = MongoDbProvider.getUserWithLogin(login);
+
         MongoDbProvider.deleteUser(login);
 
         context.response().end(Json.encodePrettily(new BasicResult(1, "User deleted")));
+
+        if (user != null) {
+            makeHistory(user.houseId,"User deleted, login: " + login);
+        }
     }
 
     private void handleListUsers(RoutingContext context) {
@@ -177,13 +197,13 @@ public class MainVerticle extends AbstractVerticle {
         }
 
         String houseId = context.request().getParam("houseId");
-        ArrayList<GetUserResult> users = new ArrayList<>();
+        ArrayList<UserResult> users = new ArrayList<>();
 
         List<SM_USER> mongoUsers = MongoDbProvider.getUsers(houseId);
 
         if (mongoUsers != null && !mongoUsers.isEmpty()) {
             for (SM_USER user: mongoUsers) {
-                users.add(new GetUserResult(user));
+                users.add(new UserResult(user));
             }
 
             context.response().end(Json.encodePrettily(new GetUsersResult(users)));
@@ -275,9 +295,15 @@ public class MainVerticle extends AbstractVerticle {
 
         String sensorId = context.request().getParam("sensorId");
 
+        SM_SENSOR sensor = MongoDbProvider.getSensor(sensorId);
+
         MongoDbProvider.deleteSensor(sensorId);
 
         context.response().end(Json.encodePrettily(new BasicResult(1, "Sensor deleted")));
+
+        if (sensor != null) {
+            makeHistory(sensor.houseId, "Sensor deleted, id: " + sensorId);
+        }
     }
 
     // ACTOR
@@ -334,26 +360,39 @@ public class MainVerticle extends AbstractVerticle {
         }
 
         String actorId = context.request().getParam("actorId");
+        SM_ACTOR actor = MongoDbProvider.getActor(actorId);
         MongoDbProvider.deleteActor(actorId);
 
         context.response().end(Json.encodePrettily(new BasicResult(1, "Actor deleted")));
+
+        if (actor != null) {
+            makeHistory(actor.houseId, "Actor deleted, id: " + actorId);
+        }
     }
 
     // HISTORY
 
     private void handleHistory(RoutingContext context) {
+        String token = context.request().getParam("token");
 
-//        String token = context.request().getParam("token");
-//        SM_INTEGRATOR integrator = MongoDbProvider.getIntegrator(token);
-//
-//        if (integrator == null) {
-//            sendBadIntegratorTokenError(context.response());
-//            return;
-//        }
-//
-//        String actorId = context.request().getParam("actorId");
-//        MongoDbProvider.deleteActor(actorId);
-//
-//        context.response().end(Json.encodePrettily(new BasicResult(1, "Actor deleted")));
+        if (!validToken(token)) {
+            sendBadTokenError(context.response());
+            return;
+        }
+
+        ArrayList<GetHistoryResult> histories = new ArrayList<>();
+
+        String houseId = context.request().getParam("houseId");
+        List<SM_HISTORY> mongoHistory = MongoDbProvider.getAllHistory(houseId);
+
+        if (mongoHistory != null && !mongoHistory.isEmpty()) {
+            for (SM_HISTORY history: mongoHistory) {
+                histories.add(new GetHistoryResult(history));
+            }
+
+            context.response().end(Json.encodePrettily(new GetAllHistoryResult(histories)));
+        } else {
+            sendError(401, context.response(), Json.encodePrettily(new BasicResult(1, "No history")));
+        }
     }
 }

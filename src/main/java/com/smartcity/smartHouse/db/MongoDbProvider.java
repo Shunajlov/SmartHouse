@@ -41,11 +41,11 @@ public class MongoDbProvider {
             .asList();
 
         if (integrators == null || integrators.isEmpty()) {
-            System.out.println("Such integrator not exist in database");
+            System.out.println("Integrator with login: " + login +  " password: " + password + " not exist in database");
             return null;
         } else {
             SM_INTEGRATOR integrator = integrators.get(0);
-            System.out.println("Such integrator exists in database");
+            System.out.println("Integrator with login: " + login +  " password: " + password + " exists in database");
             return integrator;
         }
     }
@@ -57,11 +57,11 @@ public class MongoDbProvider {
             .asList();
 
         if (integrators == null || integrators.isEmpty()) {
-            System.out.println("Such integrator not exist in database");
+            System.out.println("Integrator with token: " + token + " not exist in database");
             return null;
         } else {
             SM_INTEGRATOR integrator = integrators.get(0);
-            System.out.println("Such integrator exists in database");
+            System.out.println("Integrator with token: " + token + " exists in database");
             return integrator;
         }
     }
@@ -118,7 +118,7 @@ public class MongoDbProvider {
         }
     }
 
-    public static List<SM_USER> getUsersWithLogin(String login) {
+    public static SM_USER getUserWithLogin(String login) {
 
         final List<SM_USER> users = datastore.createQuery(SM_USER.class)
             .field("login").equal(login)
@@ -128,8 +128,9 @@ public class MongoDbProvider {
             System.out.println("No users");
             return null;
         } else {
+            SM_USER user = users.get(0);
             System.out.println("Users count: " + users.size());
-            return users;
+            return user;
         }
     }
 
@@ -316,9 +317,10 @@ public class MongoDbProvider {
 
     // SM_HISTORY
 
-    public static List<SM_HISTORY> getAllHistory() {
+    public static List<SM_HISTORY> getAllHistory(String houseId) {
 
         final List<SM_HISTORY> historyList = datastore.createQuery(SM_HISTORY.class)
+            .field("houseId").equal(houseId)
             .asList();
 
         if (historyList == null || historyList.isEmpty()) {

@@ -75,5 +75,7 @@ public class Const {
     public static final String ACTOR = "/api/actor/:actorId/:token";
     public static final String ACTOR_DELETE = "/api/actorDelete/:actorId/:token";
 
-    public static final String HISTORY_LIST = "/api/historyList";
+    public static final String HISTORY_LIST = "/api/historyList/:houseId/:token";
+
+
 }

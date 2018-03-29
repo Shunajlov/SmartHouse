@@ -23,7 +23,7 @@ public class SensorAnalog extends SensorBase {
                 System.out.println("Sensor " + sensorId.toString() + " run");
                 generateData();
                 writeData();
-                System.out.println("Value: " + value.toString());
+                System.out.println("Sensor " + sensorId.toString() + " Value: " + value.toString());
             }
         }, 0, 1*5*1000);
     }

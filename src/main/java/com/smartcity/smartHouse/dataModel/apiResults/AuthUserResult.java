@@ -1,19 +1,26 @@
 package com.smartcity.smartHouse.dataModel.apiResults;
 
+import com.smartcity.smartHouse.dataModel.Storage.SM_USER;
+
 import java.io.Serializable;
 
-public class AuthUserResult extends AuthResult implements Serializable {
-    private String houseId;
+public class AuthUserResult extends UserResult implements Serializable {
+    protected boolean isIntegrator;
 
-    public AuthUserResult(String houseId) {
-        this.houseId = houseId;
+    public AuthUserResult() {
+        super();
     }
 
-    public String getHouseId() {
-        return houseId;
+    public AuthUserResult(SM_USER user) {
+        id = user.getId().toString();
+        login = user.login;
+        password = user.password;
+        name = user.name;
+        token = user.token;
+        houseId = user.houseId;
+        isIntegrator = false;
     }
 
-    public void setHouseId(String houseId) {
-        this.houseId = houseId;
-    }
+    public boolean getIsIntegrator() { return isIntegrator; }
+    public void setIntegrator(boolean isIntegrator) { this.isIntegrator = isIntegrator; }
 }

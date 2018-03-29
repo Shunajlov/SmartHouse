@@ -7,19 +7,5 @@ import com.smartcity.smartHouse.Const;
 import java.util.Map;
 
 public class Utils {
-//    isTokenValid
-//    public static boolean isTokenValid(String token) {
-//
-//        for (Map.Entry<String, AuthRoomerResult> entry : Const.tokenRoomersMap.entrySet()) {
-//            if (entry.getValue().getToken() != null && entry.getValue().getToken().equals(token))
-//                return true;
-//        }
-//
-//        for (Map.Entry<String, AuthResult> entry : Const.tokenUsersMap.entrySet()) {
-//            if (entry.getValue().getToken() != null && entry.getValue().getToken().equals(token))
-//                return true;
-//        }
-//
-//        return false;
-//    }
+
 }

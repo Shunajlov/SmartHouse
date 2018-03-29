@@ -3,17 +3,17 @@ package com.smartcity.smartHouse.dataModel.apiResults;
 import java.util.ArrayList;
 
 public class GetUsersResult {
-    private ArrayList<GetUserResult> users;
+    private ArrayList<UserResult> users;
 
-    public GetUsersResult(ArrayList<GetUserResult> users) {
+    public GetUsersResult(ArrayList<UserResult> users) {
         this.users = users;
     }
 
-    public ArrayList<GetUserResult> getUsers() {
+    public ArrayList<UserResult> getUsers() {
         return users;
     }
 
-    public void setUsers(ArrayList<GetUserResult> users) {
+    public void setUsers(ArrayList<UserResult> users) {
         this.users = users;
     }
 }

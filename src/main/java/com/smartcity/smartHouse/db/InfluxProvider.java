@@ -11,21 +11,23 @@ import java.util.concurrent.TimeUnit;
 
 public class InfluxProvider {
 
-    //    Еще раз новые настройки подключения:
-//    инфлюкс: influx-taberum-461f.aivencloud.com: 26215
+//    новые данные для подключения
+//    инфлюкс:   influx-pogahuko-41bd.aivencloud.com: 28496
 //    логин: avnadmin
-//    пароль: eabvua78m3ko6nyo
+//    пароль: v0to1jeosa0qsluz
 //
-//    графана:   grafana-taberum-461f.aivencloud.com
+//    графана: grafana-pogahuko-41bd.aivencloud.com
 //    логин: avnadmin
-//    пароль: j2osyza843sdz83c
+//    пароль: xa1g5p51wgks6xc5
 
     private static final String DB_NAME = "defaultdb";
-    private static final String SERVER_ENDPOINT = "https://influx-taberum-461f.aivencloud.com:26215";
+    private static final String SERVER_ENDPOINT = "https://influx-pogahuko-41bd.aivencloud.com:28496";
+    private static final String USERNAME = "avnadmin";
+    private static final String PASSWORD = "v0to1jeosa0qsluz";
     private static InfluxDB client;
 
     public static void initInflux() {
-        client = InfluxDBFactory.connect(SERVER_ENDPOINT, "avnadmin", "eabvua78m3ko6nyo");
+        client = InfluxDBFactory.connect(SERVER_ENDPOINT, USERNAME, PASSWORD);
     }
 
 //    public static void checkSensorForExtreme(Sensor sensor, String roomName) {
@@ -39,7 +41,7 @@ public class InfluxProvider {
 //    }
 
     public static void writeToInfluxData(String measurement, String field, Integer value){
-        InfluxDB influxDB = InfluxDBFactory.connect(SERVER_ENDPOINT, "avnadmin", "eabvua78m3ko6nyo");
+        InfluxDB influxDB = InfluxDBFactory.connect(SERVER_ENDPOINT, USERNAME, PASSWORD);
 
         Date date = new Date();
         long longDate = date.getTime();
@@ -52,7 +54,7 @@ public class InfluxProvider {
     }
 
     public static void writeToInfluxData(Date date, String measurement, String field, Double value, String field2, Double value2){
-        InfluxDB influxDB = InfluxDBFactory.connect(SERVER_ENDPOINT, "avnadmin", "eabvua78m3ko6nyo");
+        InfluxDB influxDB = InfluxDBFactory.connect(SERVER_ENDPOINT, USERNAME, PASSWORD);
 
         long longDate = date.getTime();
 

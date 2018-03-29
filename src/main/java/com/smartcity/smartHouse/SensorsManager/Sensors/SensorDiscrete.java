@@ -23,7 +23,7 @@ public class SensorDiscrete extends SensorBase {
                 System.out.println("Sensor " + sensorId.toString() + " run");
                 generateData();
                 writeData();
-                System.out.println("Value: " + value.toString());
+                System.out.println("Sensor " + sensorId.toString() + " Value: " + value.toString());
             }
         }, 0, 1*5*1000);
     }
@@ -39,9 +39,9 @@ public class SensorDiscrete extends SensorBase {
         Random rand = new Random();
         int value = rand.nextInt(1024);
 
-        if (value > 66) {
+        if (value > 666) {
             valueOne();
-        } else if (value > 33) {
+        } else if (value > 333) {
             valueZero();
         }
     }
