@@ -2,8 +2,10 @@ package com.smartcity.smartHouse;
 
 import com.mongodb.Mongo;
 import com.smartcity.smartHouse.Enums.UserType;
+import com.smartcity.smartHouse.ScenarioManager.ScenarioManager;
 import com.smartcity.smartHouse.SensorsManager.Actors.ActorType;
 import com.smartcity.smartHouse.SensorsManager.Sensors.SensorType;
+import com.smartcity.smartHouse.SensorsManager.SensorsManager;
 import com.smartcity.smartHouse.dataModel.Storage.*;
 import com.smartcity.smartHouse.dataModel.apiResults.*;
 import com.smartcity.smartHouse.db.MongoDbProvider;
@@ -62,38 +64,38 @@ public class MainVerticle extends AbstractVerticle {
         router.get(Const.TEST).handler(this::handleTestMethod);
         router.get(Const.AUTH).handler(this::handleAuth);
 
-        router.post(Const.INTEGRATOR_ADD).handler(this::handleIntegratorAdd);
+        router.get(Const.INTEGRATOR_ADD).handler(this::handleIntegratorAdd);
 
         router.get(Const.USERS_LIST).handler(this::handleListUsers);
-        router.post(Const.USER_ADD).handler(this::handleUserAdd);
-        router.post(Const.USER_DELETE).handler(this::handleUserDelete);
+        router.get(Const.USER_ADD).handler(this::handleUserAdd);
+        router.get(Const.USER_DELETE).handler(this::handleUserDelete);
 
         router.get(Const.USER_PLAN).handler(this::handleUserPlan);
-        router.post(Const.USER_PLAN_EDIT).handler(this::handleUserPlanEdit);
+        router.get(Const.USER_PLAN_EDIT).handler(this::handleUserPlanEdit);
 
         router.get(Const.HOUSES_LIST).handler(this::handleListHouses);
-        router.post(Const.HOUSE_ADD).handler(this::handleHouseAdd);
-        router.post(Const.HOUSE_DELETE).handler(this::handleHouseDelete);
+        router.get(Const.HOUSE_ADD).handler(this::handleHouseAdd);
+        router.get(Const.HOUSE_DELETE).handler(this::handleHouseDelete);
 
         router.get(Const.SENSORS_LIST).handler(this::handleListSensors);
         router.get(Const.SENSOR).handler(this::handleSensor);
-        router.post(Const.SENSOR_ADD).handler(this::handleSensorAdd);
-        router.post(Const.SENSOR_EDIT).handler(this::handleSensorEdit);
-        router.post(Const.SENSOR_DELETE).handler(this::handleSensorDelete);
+        router.get(Const.SENSOR_ADD).handler(this::handleSensorAdd);
+        router.get(Const.SENSOR_EDIT).handler(this::handleSensorEdit);
+        router.get(Const.SENSOR_DELETE).handler(this::handleSensorDelete);
 
         router.get(Const.ACTORS_LIST).handler(this::handleActors);
         router.get(Const.ACTOR).handler(this::handleActor);
-        router.post(Const.ACTOR_ADD).handler(this::handleActorAdd);
-        router.post(Const.ACTOR_EDIT).handler(this::handleActorEdit);
-        router.post(Const.ACTOR_DELETE).handler(this::handleActorDelete);
+        router.get(Const.ACTOR_ADD).handler(this::handleActorAdd);
+        router.get(Const.ACTOR_EDIT).handler(this::handleActorEdit);
+        router.get(Const.ACTOR_DELETE).handler(this::handleActorDelete);
 
         router.get(Const.SCENARIOS_LIST).handler(this::handleScenariosList);
         router.get(Const.SCENARIO).handler(this::handleScenario);
-        router.post(Const.SCENARIO_ADD).handler(this::handleScenarioAdd);
-        router.post(Const.SCENARIO_EDIT).handler(this::handleScenarioEdit);
-        router.post(Const.SCENARIO_ADD_ITEM).handler(this::handleScenarioAddItem);
-        router.post(Const.SCENARIO_REMOVE_ITEM).handler(this::handleScenarioRemoveItem);
-        router.post(Const.SCENARIO_DELETE).handler(this::handleScenarioDelete);
+        router.get(Const.SCENARIO_ADD).handler(this::handleScenarioAdd);
+        router.get(Const.SCENARIO_EDIT).handler(this::handleScenarioEdit);
+        router.get(Const.SCENARIO_ADD_ITEM).handler(this::handleScenarioAddItem);
+        router.get(Const.SCENARIO_REMOVE_ITEM).handler(this::handleScenarioRemoveItem);
+        router.get(Const.SCENARIO_DELETE).handler(this::handleScenarioDelete);
 
         router.get(Const.HISTORY_LIST).handler(this::handleHistory);
 
@@ -444,6 +446,7 @@ public class MainVerticle extends AbstractVerticle {
         String extreme = context.request().getParam("extreme");
         String fieldName = context.request().getParam("fieldName");
         String sensorType = context.request().getParam("sensorType");
+        String active = context.request().getParam("active");
 
         SM_SENSOR sensor = new SM_SENSOR();
         sensor.houseId = houseId;
@@ -457,6 +460,14 @@ public class MainVerticle extends AbstractVerticle {
         sensor.fieldName = fieldName;
         sensor.sensorType = SensorType.valueOf(sensorType);
         sensor.extreme = Integer.parseInt(extreme);
+        sensor.active = Boolean.parseBoolean(active);
+        sensor.value = 0;
+
+        if (sensor.active) {
+            SensorsManager.startSensor(sensor.getId().toString());
+        } else {
+            SensorsManager.stopSensor(sensor.getId().toString());
+        }
 
         MongoDbProvider.saveSensor(sensor);
 
@@ -486,6 +497,12 @@ public class MainVerticle extends AbstractVerticle {
 
         sensor.extreme = Integer.parseInt(extreme);
         sensor.active = Boolean.parseBoolean(active);
+
+        if (sensor.active) {
+            SensorsManager.startSensor(sensorId);
+        } else {
+            SensorsManager.stopSensor(sensorId);
+        }
 
         MongoDbProvider.saveSensor(sensor);
 
@@ -573,6 +590,7 @@ public class MainVerticle extends AbstractVerticle {
         String houseId = context.request().getParam("houseId");
         String fieldName = context.request().getParam("fieldName");
         String actorType = context.request().getParam("actorType");
+        String value = context.request().getParam("value");
 
         SM_ACTOR actor = new SM_ACTOR();
         actor.houseId = houseId;
@@ -585,7 +603,9 @@ public class MainVerticle extends AbstractVerticle {
         }
         actor.fieldName = fieldName;
         actor.actorType = ActorType.valueOf(actorType);
-        actor.value = 0;
+        actor.value = Integer.parseInt(value);
+
+        SensorsManager.setValueForActor(actor.getId().toString(), actor.value);
 
         MongoDbProvider.saveActor(actor);
 
@@ -613,6 +633,8 @@ public class MainVerticle extends AbstractVerticle {
         }
 
         actor.value = Integer.parseInt(value);
+
+        SensorsManager.setValueForActor(actor.getId().toString(), actor.value);
 
         MongoDbProvider.saveActor(actor);
 

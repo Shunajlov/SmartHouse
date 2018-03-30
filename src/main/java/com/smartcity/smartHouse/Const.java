@@ -36,27 +36,15 @@ public class Const {
 
     public static final String SENSORS_LIST = "/api/sensors/:houseId/:token";
     public static final String SENSOR = "/api/sensor/:sensorId/:token";
-    public static final String SENSOR_ADD = "/api/sensorAdd/:houseId/:token/:fieldName/:sensorType/:extreme";
+    public static final String SENSOR_ADD = "/api/sensorAdd/:houseId/:token/:fieldName/:sensorType/:extreme/:active";
     public static final String SENSOR_EDIT = "/api/sensorEdit/:sensorId/:token/:active/:extreme";
     public static final String SENSOR_DELETE = "/api/sensorDelete/:sensorId/:token";
 
     public static final String ACTORS_LIST = "/api/actors/:houseId/:token";
     public static final String ACTOR = "/api/actor/:actorId/:token";
-    public static final String ACTOR_ADD = "/api/actorAdd/:houseId/:token/:fieldName/:actorType";
+    public static final String ACTOR_ADD = "/api/actorAdd/:houseId/:token/:fieldName/:actorType/:value";
     public static final String ACTOR_EDIT = "/api/actorEdit/:actorId/:token/:value";
     public static final String ACTOR_DELETE = "/api/actorDelete/:actorId/:token";
-
-//    13. Просмотр сценариев(ид дома, токен)-> список сценариев(список объектов)
-//    GET
-//
-//14.Добавление сценария(ид дома, наименование сценария, дикшинари:ид датчика-значение, дикшинари: ид механизма-значение, токен)->нихуя
-//        POST
-//
-//15. Удаление сценария(ид сценария, токен)-> нихуя
-//        POST
-//
-//16.Редактирование сценария(ид сценария, дикшинари:ид датчика-значение, дикшинари: ид механизма-значение)->нихуя
-//        POST
 
     public static final String SCENARIOS_LIST = "/api/scenarios/:houseId/:token";
     public static final String SCENARIO = "/api/scenario/:scenarioId/:token";

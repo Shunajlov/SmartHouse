@@ -7,7 +7,7 @@ import org.bson.types.ObjectId;
 import org.mongodb.morphia.Datastore;
 import org.mongodb.morphia.Morphia;
 
-import java.util.List;
+import java.util.*;
 
 public class MongoDbProvider {
 
@@ -448,7 +448,7 @@ public class MongoDbProvider {
             System.out.println("No scenarios");
             return null;
         } else {
-            System.out.println("Scenarios count: " + scenarios.size());
+//            System.out.println("Scenarios count: " + scenarios.size());
             return scenarios;
         }
     }
@@ -467,6 +467,27 @@ public class MongoDbProvider {
             System.out.println("Scenario with id: " + scenarioId.toString() + " exists in database");
             return scenario;
         }
+    }
+
+    static public List<SM_SCENARIO_ITEM> getScenarioItems(String houseId, String sensorId) {
+
+        List<SM_SCENARIO> scenarios = getScenarioList(houseId);
+
+        List<SM_SCENARIO_ITEM> items = new ArrayList<SM_SCENARIO_ITEM>();
+
+        if (scenarios != null) {
+            for (SM_SCENARIO scenario: scenarios) {
+                if (scenario.scenario_items != null) {
+                    for (SM_SCENARIO_ITEM item: scenario.scenario_items) {
+                        if (item.sensorId.equals(sensorId)) {
+                            items.add(item);
+                        }
+                    }
+                }
+            }
+        }
+
+        return items;
     }
 
     public static void deleteScenario(String scenarioId) {

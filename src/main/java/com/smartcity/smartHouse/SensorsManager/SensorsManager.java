@@ -20,8 +20,8 @@ import java.util.stream.Collectors;
 
 public class SensorsManager {
 
-    private static List<ActorBase> actors = new ArrayList<ActorBase>();
-    private static List<SensorBase> sensors = new ArrayList<SensorBase>();
+    public static List<ActorBase> actors = new ArrayList<ActorBase>();
+    public static List<SensorBase> sensors = new ArrayList<SensorBase>();
 
     // ACTORS
 
@@ -99,6 +99,16 @@ public class SensorsManager {
         System.out.println("All sensors started");
     }
 
+    public static void startAllActiveSensors() {
+        for (int i = 0; i < sensors.size(); i++) {
+            SensorBase sensor = sensors.get(i);
+            if (sensor.active) {
+                sensors.get(i).start();
+            }
+        }
+        System.out.println("All sensors started");
+    }
+
     public static void stopAllSensors() {
         for (int i = 0; i < sensors.size(); i++) {
             sensors.get(i).stop();
@@ -156,9 +166,7 @@ public class SensorsManager {
 
     public static void setupDefaultSensorsAndActors() {
 
-        SM_HOUSE house = new SM_HOUSE();
-        house.name = "Дом 2";
-        MongoDbProvider.saveHouse(house);
+        SM_HOUSE house = MongoDbProvider.getHouse("5abd49069433ee36debb84d4");
 
 //        ДАТЧИКИ
 
@@ -170,6 +178,7 @@ public class SensorsManager {
         tempGost.fieldName = "Temperatura v gostinoy";
         tempGost.value = 21;
         tempGost.sensorType = SensorType.ANALOG;
+        tempGost.extreme = 100;
         MongoDbProvider.saveSensor(tempGost);
 
 //        Влажность в гостиной
@@ -179,6 +188,7 @@ public class SensorsManager {
         vlazhGost.measurment = house.name;
         vlazhGost.fieldName = "Vlazhnost v gostinoy";
         vlazhGost.value = 55;
+        vlazhGost.extreme = 100;
         vlazhGost.sensorType = SensorType.ANALOG;
         MongoDbProvider.saveSensor(vlazhGost);
 
@@ -189,6 +199,7 @@ public class SensorsManager {
         dimKuhn.measurment = house.name;
         dimKuhn.fieldName = "Dim na kuhne";
         dimKuhn.value = 0;
+        dimKuhn.extreme = 2;
         dimKuhn.sensorType = SensorType.DISCRETE;
         MongoDbProvider.saveSensor(dimKuhn);
 
@@ -199,6 +210,7 @@ public class SensorsManager {
         vhDver.measurment = house.name;
         vhDver.fieldName = "Vhodnaya dver";
         vhDver.value = 0;
+        vhDver.extreme = 2;
         vhDver.sensorType = SensorType.DISCRETE;
         MongoDbProvider.saveSensor(vhDver);
 
@@ -209,6 +221,7 @@ public class SensorsManager {
         oknoKuhn.measurment = house.name;
         oknoKuhn.fieldName = "Okno na kuhne";
         oknoKuhn.value = 0;
+        oknoKuhn.extreme = 2;
         oknoKuhn.sensorType = SensorType.DISCRETE;
         MongoDbProvider.saveSensor(oknoKuhn);
 
@@ -219,6 +232,7 @@ public class SensorsManager {
         rozKuhn.measurment = house.name;
         rozKuhn.fieldName = "Rozetka na kuhne";
         rozKuhn.value = 0;
+        rozKuhn.extreme = 2;
         rozKuhn.sensorType = SensorType.DISCRETE;
         MongoDbProvider.saveSensor(rozKuhn);
 
@@ -229,6 +243,7 @@ public class SensorsManager {
         svetGost.measurment = house.name;
         svetGost.fieldName = "Vikluchatel sveta v gostinoy";
         svetGost.value = 0;
+        svetGost.extreme = 2;
         svetGost.sensorType = SensorType.DISCRETE;
         MongoDbProvider.saveSensor(svetGost);
 
@@ -239,6 +254,7 @@ public class SensorsManager {
         waterWarm.measurment = house.name;
         waterWarm.fieldName = "Schetchik goryachei vodi";
         waterWarm.value = 305;
+        waterWarm.extreme = 100;
         waterWarm.sensorType = SensorType.ANALOG;
         MongoDbProvider.saveSensor(waterWarm);
 
@@ -249,6 +265,7 @@ public class SensorsManager {
         waterCold.measurment = house.name;
         waterCold.fieldName = "Schetchik holodnoy vodi";
         waterCold.value = 150;
+        waterCold.extreme = 100;
         waterCold.sensorType = SensorType.ANALOG;
         MongoDbProvider.saveSensor(waterCold);
 
@@ -259,6 +276,7 @@ public class SensorsManager {
         dvizhPrih.measurment = house.name;
         dvizhPrih.fieldName = "Datchik dvijenia d prihojey";
         dvizhPrih.value = 30;
+        dvizhPrih.extreme = 100;
         dvizhPrih.sensorType = SensorType.ANALOG;
         MongoDbProvider.saveSensor(dvizhPrih);
 
@@ -433,7 +451,8 @@ public class SensorsManager {
         getSensorsFromDb();
 
         startAllActors();
-        startAllSensors();
+//        startAllSensors();
+        startAllActiveSensors();
     }
 
 

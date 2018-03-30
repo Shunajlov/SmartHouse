@@ -20,10 +20,8 @@ public class SensorAnalog extends SensorBase {
         timer.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
-                System.out.println("Sensor " + sensorId.toString() + " run");
                 generateData();
                 writeData();
-                System.out.println("Sensor " + sensorId.toString() + " Value: " + value.toString());
             }
         }, 0, 1*5*1000);
     }
@@ -39,9 +37,9 @@ public class SensorAnalog extends SensorBase {
         Random rand = new Random();
         int value = rand.nextInt(1024);
 
-        if (value > 66) {
+        if (value > 666) {
             valueIncrease();
-        } else if (value > 33) {
+        } else if (value > 333) {
             valueDecrease();
         }
     }
