@@ -1,11 +1,13 @@
 package com.smartcity.smartHouse.dataModel.apiResults;
 
+import com.smartcity.smartHouse.Enums.UserType;
 import com.smartcity.smartHouse.dataModel.Storage.SM_USER;
 
 import java.io.Serializable;
 
 public class UserResult implements Serializable {
     protected String id, login, password, name, token, houseId;
+    protected UserType type;
 
     public UserResult() {
         super();
@@ -18,6 +20,7 @@ public class UserResult implements Serializable {
         name = user.name;
         token = user.token;
         houseId = user.houseId;
+        type = user.type;
     }
 
     public String getId() { return id; }
@@ -37,4 +40,7 @@ public class UserResult implements Serializable {
 
     public String getHouseId() { return houseId; }
     public void setHouseId(String houseId) { this.houseId = houseId; }
+
+    public UserType getType() { return type; }
+    public void setType(UserType type) { this.type = type; }
 }

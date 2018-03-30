@@ -1,5 +1,6 @@
 package com.smartcity.smartHouse.SensorsManager;
 
+import com.smartcity.smartHouse.Enums.UserType;
 import com.smartcity.smartHouse.SensorsManager.Actors.ActorAnalog;
 import com.smartcity.smartHouse.SensorsManager.Actors.ActorBase;
 import com.smartcity.smartHouse.SensorsManager.Actors.ActorDiscrete;
@@ -8,12 +9,12 @@ import com.smartcity.smartHouse.SensorsManager.Sensors.SensorAnalog;
 import com.smartcity.smartHouse.SensorsManager.Sensors.SensorBase;
 import com.smartcity.smartHouse.SensorsManager.Sensors.SensorDiscrete;
 import com.smartcity.smartHouse.SensorsManager.Sensors.SensorType;
-import com.smartcity.smartHouse.dataModel.Storage.SM_ACTOR;
-import com.smartcity.smartHouse.dataModel.Storage.SM_HOUSE;
-import com.smartcity.smartHouse.dataModel.Storage.SM_SENSOR;
+import com.smartcity.smartHouse.dataModel.Storage.*;
 import com.smartcity.smartHouse.db.MongoDbProvider;
+import com.smartcity.smartHouse.utils.Utils;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -364,6 +365,67 @@ public class SensorsManager {
         MongoDbProvider.saveActor(pozharTrev);
 
         getAndStartAllSensorsAndActors();
+    }
+
+    public static void setupDefaultUsers() {
+
+        SM_USER kichkin = new SM_USER();
+        kichkin.login = "kichkin";
+        kichkin.password = "password";
+        kichkin.name = "Кычкин Алексей Владимирович";
+        kichkin.houseId = "5abd18279433ee27b68c5d11";
+        kichkin.token = Utils.generateToken();
+        kichkin.type = UserType.BASE;
+        MongoDbProvider.saveUser(kichkin);
+
+        SM_USER vikentieva = new SM_USER();
+        vikentieva.login = "vikentieva";
+        vikentieva.password = "password";
+        vikentieva.name = "Викентьева Ольга Леонидовна";
+        vikentieva.houseId = "5abd18279433ee27b68c5d11";
+        vikentieva.token = Utils.generateToken();
+        vikentieva.type = UserType.BASE;
+        MongoDbProvider.saveUser(vikentieva);
+
+        SM_USER lebedev = new SM_USER();
+        lebedev.login = "lebedev";
+        lebedev.password = "password";
+        lebedev.name = "Лебедев Виктор Валерьевич";
+        lebedev.houseId = "5abd18279433ee27b68c5d11";
+        lebedev.token = Utils.generateToken();
+        lebedev.type = UserType.BASE;
+        MongoDbProvider.saveUser(lebedev);
+
+        SM_USER korotun = new SM_USER();
+        korotun.login = "korotun";
+        korotun.password = "password";
+        korotun.name = "Коротун Василиса Павловна";
+        korotun.houseId = "5abd18279433ee27b68c5d11";
+        korotun.token = Utils.generateToken();
+        korotun.type = UserType.BASE;
+        MongoDbProvider.saveUser(korotun);
+    }
+
+    public static void setupDefaultScenario() {
+
+        SM_SCENARIO_ITEM item = new SM_SCENARIO_ITEM();
+        item.actorId = "5abd49079433ee36debb84df";
+        item.actorValue = 100;
+        item.sensorId = "5abd49069433ee36debb84d5";
+        item.sensorValue = 150;
+
+        SM_SCENARIO_ITEM itemTwo = new SM_SCENARIO_ITEM();
+        itemTwo.actorId = "5abd49079433ee36debb84df";
+        itemTwo.actorValue = 100;
+        itemTwo.sensorId = "5abd49069433ee36debb84d6";
+        itemTwo.sensorValue = 70;
+
+        SM_SCENARIO scenario = new SM_SCENARIO();
+        scenario.name = "Сценарий 1";
+        scenario.houseId = "5abd49069433ee36debb84d4";
+        scenario.scenario_items = Arrays.asList(item, itemTwo);
+
+        MongoDbProvider.saveScenario(scenario);
     }
 
     public static void getAndStartAllSensorsAndActors() {

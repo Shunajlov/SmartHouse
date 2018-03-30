@@ -18,6 +18,7 @@ public class AuthUserResult extends UserResult implements Serializable {
         name = user.name;
         token = user.token;
         houseId = user.houseId;
+        type = user.type;
         isIntegrator = false;
     }
 

@@ -1,5 +1,7 @@
 package com.smartcity.smartHouse;
 
+import com.mongodb.Mongo;
+import com.smartcity.smartHouse.Enums.UserType;
 import com.smartcity.smartHouse.SensorsManager.Actors.ActorType;
 import com.smartcity.smartHouse.SensorsManager.Sensors.SensorType;
 import com.smartcity.smartHouse.dataModel.Storage.*;
@@ -66,6 +68,9 @@ public class MainVerticle extends AbstractVerticle {
         router.post(Const.USER_ADD).handler(this::handleUserAdd);
         router.post(Const.USER_DELETE).handler(this::handleUserDelete);
 
+        router.get(Const.USER_PLAN).handler(this::handleUserPlan);
+        router.post(Const.USER_PLAN_EDIT).handler(this::handleUserPlanEdit);
+
         router.get(Const.HOUSES_LIST).handler(this::handleListHouses);
         router.post(Const.HOUSE_ADD).handler(this::handleHouseAdd);
         router.post(Const.HOUSE_DELETE).handler(this::handleHouseDelete);
@@ -73,14 +78,26 @@ public class MainVerticle extends AbstractVerticle {
         router.get(Const.SENSORS_LIST).handler(this::handleListSensors);
         router.get(Const.SENSOR).handler(this::handleSensor);
         router.post(Const.SENSOR_ADD).handler(this::handleSensorAdd);
+        router.post(Const.SENSOR_EDIT).handler(this::handleSensorEdit);
         router.post(Const.SENSOR_DELETE).handler(this::handleSensorDelete);
 
         router.get(Const.ACTORS_LIST).handler(this::handleActors);
         router.get(Const.ACTOR).handler(this::handleActor);
         router.post(Const.ACTOR_ADD).handler(this::handleActorAdd);
+        router.post(Const.ACTOR_EDIT).handler(this::handleActorEdit);
         router.post(Const.ACTOR_DELETE).handler(this::handleActorDelete);
 
+        router.get(Const.SCENARIOS_LIST).handler(this::handleScenariosList);
+        router.get(Const.SCENARIO).handler(this::handleScenario);
+        router.post(Const.SCENARIO_ADD).handler(this::handleScenarioAdd);
+        router.post(Const.SCENARIO_EDIT).handler(this::handleScenarioEdit);
+        router.post(Const.SCENARIO_ADD_ITEM).handler(this::handleScenarioAddItem);
+        router.post(Const.SCENARIO_REMOVE_ITEM).handler(this::handleScenarioRemoveItem);
+        router.post(Const.SCENARIO_DELETE).handler(this::handleScenarioDelete);
+
         router.get(Const.HISTORY_LIST).handler(this::handleHistory);
+
+        router.get(Const.EXTREME_LIST).handler(this::handleExtremeList);
     }
 
     private void sendError(int statusCode, HttpServerResponse response, String message) {
@@ -251,6 +268,53 @@ public class MainVerticle extends AbstractVerticle {
         }
     }
 
+    // USER PLAN
+
+    private void handleUserPlan(RoutingContext context) {
+        String token = context.request().getParam("token");
+
+        if (!validToken(token)) {
+            sendBadTokenError(context.response());
+            return;
+        }
+
+        String userId = context.request().getParam("userId");
+        SM_USER user = MongoDbProvider.getUserWithId(userId);
+
+        if (user == null) {
+            sendError(401, context.response(), Json.encodePrettily(new BasicResult(1, "Wrong userId")));
+            return;
+        }
+
+        context.response().end(Json.encodePrettily(new BasicResult(0, user.type.toString())));
+    }
+
+    private void handleUserPlanEdit(RoutingContext context) {
+        String token = context.request().getParam("token");
+
+        SM_INTEGRATOR integrator = MongoDbProvider.getIntegrator(token);
+
+        if (integrator == null) {
+            sendBadTokenError(context.response());
+            return;
+        }
+
+        String userId = context.request().getParam("userId");
+        SM_USER user = MongoDbProvider.getUserWithId(userId);
+
+        if (user == null) {
+            sendError(401, context.response(), Json.encodePrettily(new BasicResult(1, "Wrong userId")));
+            return;
+        }
+
+        String plan = context.request().getParam("plan");
+
+        user.type = UserType.valueOf(plan);
+        MongoDbProvider.saveUser(user);
+
+        context.response().end(Json.encodePrettily(new UserResult(user)));
+    }
+
     // HOUSE
 
     private void handleListHouses(RoutingContext context) {
@@ -400,6 +464,35 @@ public class MainVerticle extends AbstractVerticle {
         context.response().end(Json.encodePrettily(new GetSensorResult(sensor)));
     }
 
+    private void handleSensorEdit(RoutingContext context) {
+        String token = context.request().getParam("token");
+
+        SM_INTEGRATOR integrator = MongoDbProvider.getIntegrator(token);
+
+        if (integrator == null) {
+            sendBadTokenError(context.response());
+            return;
+        }
+
+        String sensorId = context.request().getParam("sensorId");
+        String extreme = context.request().getParam("extreme");
+        String active = context.request().getParam("active");
+
+        SM_SENSOR sensor = MongoDbProvider.getSensor(sensorId);
+        if (sensor == null) {
+            sendError(401, context.response(), Json.encodePrettily(new BasicResult(1, "No such sensor")));
+            return;
+        }
+
+        sensor.extreme = Integer.parseInt(extreme);
+        sensor.active = Boolean.parseBoolean(active);
+
+        MongoDbProvider.saveSensor(sensor);
+
+        makeHistory(sensor.houseId, "Sensor edited, id: " + sensor.getId().toString());
+        context.response().end(Json.encodePrettily(new GetSensorResult(sensor)));
+    }
+
     private void handleSensorDelete(RoutingContext context) {
         String token = context.request().getParam("token");
 
@@ -500,6 +593,33 @@ public class MainVerticle extends AbstractVerticle {
         context.response().end(Json.encodePrettily(new GetActorResult(actor)));
     }
 
+    private void handleActorEdit(RoutingContext context) {
+        String token = context.request().getParam("token");
+
+        SM_INTEGRATOR integrator = MongoDbProvider.getIntegrator(token);
+
+        if (integrator == null) {
+            sendBadTokenError(context.response());
+            return;
+        }
+
+        String actorId = context.request().getParam("actorId");
+        String value = context.request().getParam("value");
+
+        SM_ACTOR actor = MongoDbProvider.getActor(actorId);
+        if (actor == null) {
+            sendError(401, context.response(), Json.encodePrettily(new BasicResult(1, "No such actor")));
+            return;
+        }
+
+        actor.value = Integer.parseInt(value);
+
+        MongoDbProvider.saveActor(actor);
+
+        makeHistory(actor.houseId, "Actor edited, id: " + actor.getId().toString());
+        context.response().end(Json.encodePrettily(new GetActorResult(actor)));
+    }
+
     private void handleActorDelete(RoutingContext context) {
         String token = context.request().getParam("token");
         SM_INTEGRATOR integrator = MongoDbProvider.getIntegrator(token);
@@ -517,6 +637,193 @@ public class MainVerticle extends AbstractVerticle {
 
         if (actor != null) {
             makeHistory(actor.houseId, "Actor deleted, id: " + actorId);
+        }
+    }
+
+    // SCENARIO
+
+    private void handleScenariosList(RoutingContext context) {
+
+        String token = context.request().getParam("token");
+
+        if (!validToken(token)) {
+            sendBadTokenError(context.response());
+            return;
+        }
+
+        String houseId = context.request().getParam("houseId");
+        ArrayList<GetScenarioResult> scenarios = new ArrayList<>();
+
+        List<SM_SCENARIO> mongoScenario = MongoDbProvider.getScenarioList(houseId);
+
+        if (mongoScenario != null && !mongoScenario.isEmpty()) {
+            for (SM_SCENARIO scenario: mongoScenario) {
+                scenarios.add(new GetScenarioResult(scenario));
+            }
+
+            context.response().end(Json.encodePrettily(new GetScenarioListResult(scenarios)));
+        } else {
+            sendError(401, context.response(), Json.encodePrettily(new BasicResult(1, "No scenarios")));
+        }
+    }
+
+    private void handleScenario(RoutingContext context) {
+        String token = context.request().getParam("token");
+
+        if (!validToken(token)) {
+            sendBadTokenError(context.response());
+            return;
+        }
+
+        String scenarioId = context.request().getParam("scenarioId");
+        SM_SCENARIO scenario = MongoDbProvider.getScenario(scenarioId);
+
+        if (scenario == null) {
+            sendError(401, context.response(), Json.encodePrettily(new BasicResult(1, "No such scenario")));
+        } else {
+            context.response().end(Json.encodePrettily(new GetScenarioResult(scenario)));
+        }
+    }
+
+    private void handleScenarioAdd(RoutingContext context) {
+        String token = context.request().getParam("token");
+
+        if (!validToken(token)) {
+            sendBadTokenError(context.response());
+            return;
+        }
+
+        String houseId = context.request().getParam("houseId");
+        String name = context.request().getParam("name");
+
+        SM_SCENARIO scenario = new SM_SCENARIO();
+        scenario.houseId = houseId;
+        SM_HOUSE house = MongoDbProvider.getHouse(houseId);
+        if (house == null) {
+            sendError(401, context.response(), Json.encodePrettily(new BasicResult(1, "No such house")));
+            return;
+        }
+        scenario.name = name;
+
+        MongoDbProvider.saveScenario(scenario);
+
+        makeHistory(scenario.houseId, "Scenario added, id: " + scenario.getId().toString());
+        context.response().end(Json.encodePrettily(new GetScenarioResult(scenario)));
+    }
+
+    private void handleScenarioEdit(RoutingContext context) {
+        String token = context.request().getParam("token");
+
+        if (!validToken(token)) {
+            sendBadTokenError(context.response());
+            return;
+        }
+
+        String scenarioId = context.request().getParam("scenarioId");
+        String name = context.request().getParam("name");
+
+        SM_SCENARIO scenario = MongoDbProvider.getScenario(scenarioId);
+        if (scenario == null) {
+            sendError(401, context.response(), Json.encodePrettily(new BasicResult(1, "No such scenario")));
+            return;
+        }
+
+        scenario.name = name;
+
+        MongoDbProvider.saveScenario(scenario);
+
+        makeHistory(scenario.houseId, "Scenario edited, id: " + scenario.getId().toString());
+        context.response().end(Json.encodePrettily(new GetScenarioResult(scenario)));
+    }
+
+    private void handleScenarioAddItem(RoutingContext context) {
+        String token = context.request().getParam("token");
+
+        if (!validToken(token)) {
+            sendBadTokenError(context.response());
+            return;
+        }
+
+        String scenarioId = context.request().getParam("scenarioId");
+        String actorId = context.request().getParam("actorId");
+        String actorValue = context.request().getParam("actorValue");
+        String sensorId = context.request().getParam("sensorId");
+        String sensorValue = context.request().getParam("sensorValue");
+
+        SM_SCENARIO scenario = MongoDbProvider.getScenario(scenarioId);
+        if (scenario == null) {
+            sendError(401, context.response(), Json.encodePrettily(new BasicResult(1, "No such scenario")));
+            return;
+        }
+
+        SM_SCENARIO_ITEM item = new SM_SCENARIO_ITEM();
+        item.actorId = actorId;
+        item.actorValue = Integer.parseInt(actorValue);
+        item.sensorId = sensorId;
+        item.sensorValue = Integer.parseInt(sensorValue);
+
+        scenario.scenario_items.add(item);
+
+        MongoDbProvider.saveScenario(scenario);
+
+        makeHistory(scenario.houseId, "Scenario item added, scenarioId: " + scenario.getId().toString());
+        context.response().end(Json.encodePrettily(new GetScenarioResult(scenario)));
+    }
+
+    private void handleScenarioRemoveItem(RoutingContext context) {
+        String token = context.request().getParam("token");
+
+        if (!validToken(token)) {
+            sendBadTokenError(context.response());
+            return;
+        }
+
+        String scenarioId = context.request().getParam("scenarioId");
+        String actorId = context.request().getParam("actorId");
+        String sensorId = context.request().getParam("sensorId");
+
+        SM_SCENARIO scenario = MongoDbProvider.getScenario(scenarioId);
+        if (scenario == null) {
+            sendError(401, context.response(), Json.encodePrettily(new BasicResult(1, "No such scenario")));
+            return;
+        }
+
+        SM_SCENARIO_ITEM itemToDelete = new SM_SCENARIO_ITEM();
+
+        for (SM_SCENARIO_ITEM item: scenario.scenario_items) {
+            if (item.sensorId.equals(sensorId) && item.actorId.equals(actorId)) {
+                itemToDelete = item;
+                break;
+            }
+            itemToDelete = null;
+        }
+
+        if (itemToDelete != null) {
+            scenario.scenario_items.remove(itemToDelete);
+            makeHistory(scenario.houseId, "Scenario item removed, scenarioId: " + scenario.getId().toString());
+        }
+
+        MongoDbProvider.saveScenario(scenario);
+
+        context.response().end(Json.encodePrettily(new GetScenarioResult(scenario)));
+    }
+
+    private void handleScenarioDelete(RoutingContext context) {
+        String token = context.request().getParam("token");
+
+        if (!validToken(token)) {
+            sendBadTokenError(context.response());
+            return;
+        }
+
+        String scenarioId = context.request().getParam("scenarioId");
+        SM_SCENARIO scenario = MongoDbProvider.getScenario(scenarioId);
+        MongoDbProvider.deleteScenario(scenarioId);
+
+        context.response().end(Json.encodePrettily(new BasicResult(1, "Scenario deleted")));
+
+        if (scenario != null) {
+            makeHistory(scenario.houseId, "Scenario deleted, id: " + scenario.getId().toString());
         }
     }
 
@@ -543,6 +850,32 @@ public class MainVerticle extends AbstractVerticle {
             context.response().end(Json.encodePrettily(new GetAllHistoryResult(histories)));
         } else {
             sendError(401, context.response(), Json.encodePrettily(new BasicResult(1, "No history")));
+        }
+    }
+
+    // EXTREME
+
+    private void handleExtremeList(RoutingContext context) {
+        String token = context.request().getParam("token");
+
+        if (!validToken(token)) {
+            sendBadTokenError(context.response());
+            return;
+        }
+
+        ArrayList<GetExtremeResult> extremes = new ArrayList<>();
+
+        String houseId = context.request().getParam("houseId");
+        List<SM_EXTREME> mongoExtreme = MongoDbProvider.getAllExtreme(houseId);
+
+        if (mongoExtreme != null && !mongoExtreme.isEmpty()) {
+            for (SM_EXTREME extreme: mongoExtreme) {
+                extremes.add(new GetExtremeResult(extreme));
+            }
+
+            context.response().end(Json.encodePrettily(new GetExtremeListResult(extremes)));
+        } else {
+            sendError(401, context.response(), Json.encodePrettily(new BasicResult(1, "No extremes")));
         }
     }
 }

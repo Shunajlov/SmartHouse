@@ -123,6 +123,22 @@ public class MongoDbProvider {
 
     // SM_USER
 
+    public static SM_USER getUserWithId(String id) {
+
+        final List<SM_USER> users = datastore.createQuery(SM_USER.class)
+            .field("id").equal(new ObjectId(id))
+            .asList();
+
+        if (users == null || users.isEmpty()) {
+            System.out.println("User with id: " + id + " not exist in database");
+            return null;
+        } else {
+            SM_USER user = users.get(0);
+            System.out.println("User with id: " + id + " exist in database");
+            return user;
+        }
+    }
+
     public static SM_USER getUser(String login, String password) {
 
         final List<SM_USER> users = datastore.createQuery(SM_USER.class)
@@ -213,11 +229,11 @@ public class MongoDbProvider {
             .asList();
 
         if (houses == null || houses.isEmpty()) {
-            System.out.println("User with id: " + id + " not exist in database");
+            System.out.println("House with id: " + id + " not exist in database");
             return null;
         } else {
             SM_HOUSE user = houses.get(0);
-            System.out.println("User with id: " + id + " exist in database");
+            System.out.println("House with id: " + id + " exist in database");
             return user;
         }
     }
@@ -400,4 +416,73 @@ public class MongoDbProvider {
     }
 
     public static void saveHistory(SM_HISTORY history) { datastore.save(history); }
+
+    // SM_EXTREME
+
+    public static List<SM_EXTREME> getAllExtreme(String houseId) {
+
+        final List<SM_EXTREME> extremes = datastore.createQuery(SM_EXTREME.class)
+            .field("houseId").equal(houseId)
+            .asList();
+
+        if (extremes == null || extremes.isEmpty()) {
+            System.out.println("No extremes");
+            return null;
+        } else {
+            System.out.println("Extremes count: " + extremes.size());
+            return extremes;
+        }
+    }
+
+    public static void saveExtreme(SM_EXTREME extreme) { datastore.save(extreme); }
+
+    // SM_SCENARIO
+
+    public static List<SM_SCENARIO> getScenarioList(String houseId) {
+
+        final List<SM_SCENARIO> scenarios = datastore.createQuery(SM_SCENARIO.class)
+            .field("houseId").equal(houseId)
+            .asList();
+
+        if (scenarios == null || scenarios.isEmpty()) {
+            System.out.println("No scenarios");
+            return null;
+        } else {
+            System.out.println("Scenarios count: " + scenarios.size());
+            return scenarios;
+        }
+    }
+
+    static public SM_SCENARIO getScenario(String scenarioId) {
+
+        final List<SM_SCENARIO> scenarios = datastore.createQuery(SM_SCENARIO.class)
+            .field("_id").equal(new ObjectId(scenarioId))
+            .asList();
+
+        if (scenarios == null || scenarios.isEmpty()) {
+            System.out.println("Scenario with id: " + scenarioId.toString() +  " not exist in database");
+            return null;
+        } else {
+            SM_SCENARIO scenario = scenarios.get(0);
+            System.out.println("Scenario with id: " + scenarioId.toString() + " exists in database");
+            return scenario;
+        }
+    }
+
+    public static void deleteScenario(String scenarioId) {
+
+        final List<SM_SCENARIO> scenarios = datastore.createQuery(SM_SCENARIO.class)
+            .field("_id").equal(new ObjectId(scenarioId))
+            .asList();
+
+        if (scenarios == null || scenarios.isEmpty()) {
+            System.out.println("No such scenario");
+        } else {
+            SM_SCENARIO scenario = scenarios.get(0);
+            datastore.delete(scenario);
+            System.out.println("Scenario deleted: " + scenario.getId().toString());
+        }
+    }
+
+    public static void saveScenario(SM_SCENARIO scenario) { datastore.save(scenario); }
 }
