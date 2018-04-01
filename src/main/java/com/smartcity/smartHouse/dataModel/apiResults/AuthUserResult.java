@@ -1,11 +1,12 @@
 package com.smartcity.smartHouse.dataModel.apiResults;
 
+import com.smartcity.smartHouse.Enums.UserType;
 import com.smartcity.smartHouse.dataModel.Storage.SM_USER;
 
 import java.io.Serializable;
 
 public class AuthUserResult extends UserResult implements Serializable {
-    protected boolean isIntegrator;
+    protected UserType userType;
 
     public AuthUserResult() {
         super();
@@ -19,9 +20,14 @@ public class AuthUserResult extends UserResult implements Serializable {
         token = user.token;
         houseId = user.houseId;
         type = user.type;
-        isIntegrator = false;
+        userType = UserType.USER;
     }
 
-    public boolean getIsIntegrator() { return isIntegrator; }
-    public void setIntegrator(boolean isIntegrator) { this.isIntegrator = isIntegrator; }
+    public UserType getUserType() {
+        return userType;
+    }
+
+    public void setUserType(UserType userType) {
+        this.userType = userType;
+    }
 }

@@ -9,4 +9,12 @@ public class GetScenarioListResult implements Serializable {
     public GetScenarioListResult(List<GetScenarioResult> scenarios) {
         this.scenarios = scenarios;
     }
+
+    public List<GetScenarioResult> getScenarios() {
+        return scenarios;
+    }
+
+    public void setScenarios(List<GetScenarioResult> scenarios) {
+        this.scenarios = scenarios;
+    }
 }

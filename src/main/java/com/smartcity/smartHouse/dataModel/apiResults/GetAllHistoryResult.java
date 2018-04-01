@@ -1,8 +1,9 @@
 package com.smartcity.smartHouse.dataModel.apiResults;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class GetAllHistoryResult {
+public class GetAllHistoryResult implements Serializable {
     private ArrayList<GetHistoryResult> events;
 
     public GetAllHistoryResult(ArrayList<GetHistoryResult> events) {

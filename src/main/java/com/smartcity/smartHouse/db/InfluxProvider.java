@@ -20,19 +20,23 @@ import java.util.concurrent.TimeUnit;
 public class InfluxProvider {
 
 //    новые данные для подключения
-//    инфлюкс:   influx-pogahuko-41bd.aivencloud.com: 28496
+//    инфлюкс:   influx-funesu-cf9a.aivencloud.com:27077
 //    логин: avnadmin
-//    пароль: v0to1jeosa0qsluz
-//
-//    графана: grafana-pogahuko-41bd.aivencloud.com
-//    логин: avnadmin
-//    пароль: xa1g5p51wgks6xc5
+//    пароль: dcmmpnnce9i6crnb
 
-    private static final String DB_NAME = "defaultdb";
-    private static final String SERVER_ENDPOINT = "https://influx-pogahuko-41bd.aivencloud.com:28496";
-    private static final String USERNAME = "avnadmin";
-    private static final String PASSWORD = "v0to1jeosa0qsluz";
+    private static String DB_NAME = "defaultdb";
+    private static String SERVER_ENDPOINT = "https://influx-funesu-cf9a.aivencloud.com:27077";
+    private static String USERNAME = "avnadmin";
+    private static String PASSWORD = "dcmmpnnce9i6crnb";
     private static InfluxDB client;
+
+    public static void connectInfluxDB(String endpoint, String dbName, String username, String password) {
+        SERVER_ENDPOINT = endpoint;
+        DB_NAME = dbName;
+        USERNAME = username;
+        PASSWORD = password;
+        initInflux();
+    }
 
     public static void initInflux() {
         client = InfluxDBFactory.connect(SERVER_ENDPOINT, USERNAME, PASSWORD);
@@ -46,37 +50,66 @@ public class InfluxProvider {
         QueryResult queryResult = client.query(query);
         List<QueryResult.Result> results = queryResult.getResults();
 
-        if (results != null) {
-            for (QueryResult.Result result: results) {
-                List<QueryResult.Series> seriesList = result.getSeries();
+        try {
+            if (results != null) {
+                for (QueryResult.Result result: results) {
+                    List<QueryResult.Series> seriesList = result.getSeries();
 
-                if (seriesList != null) {
-                    for (QueryResult.Series series: seriesList) {
-                        List<List<Object>> values = series.getValues();
-                        List<Object> lastValue = values.get(values.size() - 1);
-                        Object lastValueValue = lastValue.get(1);
-                        Double lastValueValueDouble = Double.parseDouble(lastValueValue.toString());
-
-                        return lastValueValueDouble;
-
-////                        System.out.println("Sensor with id: " + sensor.getId().toString() + " last value: " + lastValueValueDouble.toString());
-//
-//                        // check for extreme
-//                        if (lastValueValueDouble >= Double.parseDouble(sensor.extreme.toString())) {
-//                            ScenarioManager.extremeSituation(sensor, lastValueValueDouble);
-//                        } else {
-////                            System.out.println("No extreme");
-//                        }
-//
-//                        // check for scenario
-//                        ScenarioManager.checkForScenarios(sensor);
-                    }
-                } else {
+                    if (seriesList != null) {
+                        for (QueryResult.Series series: seriesList) {
+                            List<List<Object>> values = series.getValues();
+                            List<Object> lastValue = values.get(values.size() - 1);
+                            Object lastValueValue = lastValue.get(1);
+                            String lastValueValueString = lastValueValue.toString();
+                            if (!lastValueValueString.equals("")) {
+                                return Double.valueOf(lastValueValueString);
+                            }
+                        }
+                    } else {
 //                    System.out.println("Series null");
+                    }
                 }
-            }
-        } else {
+            } else {
 //            System.out.println("Results null");
+            }
+        } catch (NullPointerException e) {
+            return null;
+        }
+        return null;
+    }
+
+    public static Double queryLastValue(String fieldName, String measurment) {
+        String queryString = "SELECT mean(\"" + fieldName + "\") FROM \"autogen\".\"" + measurment + "\" GROUP BY time(1h) fill(none)";
+//        System.out.println(queryString);
+        Query query = new Query(queryString, DB_NAME);
+
+        QueryResult queryResult = client.query(query);
+        List<QueryResult.Result> results = queryResult.getResults();
+
+        try {
+            if (results != null) {
+                for (QueryResult.Result result: results) {
+                    List<QueryResult.Series> seriesList = result.getSeries();
+
+                    if (seriesList != null) {
+                        for (QueryResult.Series series: seriesList) {
+                            List<List<Object>> values = series.getValues();
+                            List<Object> lastValue = values.get(values.size() - 1);
+                            Object lastValueValue = lastValue.get(1);
+                            String lastValueValueString = lastValueValue.toString();
+                            if (lastValueValueString.equals("")) {
+                                return Double.valueOf(lastValueValueString);
+                            }
+                        }
+                    } else {
+//                    System.out.println("Series null");
+                    }
+                }
+            } else {
+                System.out.println("Results null");
+            }
+        } catch (NullPointerException e) {
+            return null;
         }
         return null;
     }

@@ -1,9 +1,7 @@
 package com.smartcity.smartHouse.ScenarioManager;
 
-import com.smartcity.smartHouse.dataModel.Storage.SM_ACTOR;
-import com.smartcity.smartHouse.dataModel.Storage.SM_EXTREME;
-import com.smartcity.smartHouse.dataModel.Storage.SM_SCENARIO_ITEM;
-import com.smartcity.smartHouse.dataModel.Storage.SM_SENSOR;
+import com.mongodb.Mongo;
+import com.smartcity.smartHouse.dataModel.Storage.*;
 import com.smartcity.smartHouse.db.InfluxProvider;
 import com.smartcity.smartHouse.db.MongoDbProvider;
 
@@ -41,21 +39,41 @@ public class ScenarioManager {
     }
 
     public static void checkForScenarios(SM_SENSOR sensor) {
-        List<SM_SCENARIO_ITEM> items = MongoDbProvider.getScenarioItems(sensor.houseId, sensor.getId().toString());
-        if (items != null & !items.isEmpty()) {
-            for (SM_SCENARIO_ITEM item: items) {
-                if (item.sensorValue <= sensor.value) {
-                    executeScenarioItem(item);
+        List<SM_SCENARIO> scenarios = MongoDbProvider.getScenarioList(sensor.houseId);
+
+        for (SM_SCENARIO scenario: scenarios) {
+            Boolean allConditionsSatisfied = true;
+            List<SM_SCENARIO_CONDITION> conditions = MongoDbProvider.getScenarioConditions(scenario.getId().toString(), false);
+            if (conditions != null && !conditions.isEmpty()) {
+                for (SM_SCENARIO_CONDITION condition: conditions) {
+                    if (condition.sensorId.equals(sensor.getId().toString())) {
+                        if (sensor.value >= condition.sensorValue) {
+                            condition.satisfied = true;
+                        } else {
+                            condition.satisfied = false;
+                            allConditionsSatisfied = false;
+                        }
+                    }
+                }
+                if (allConditionsSatisfied) {
+                    executeScenarioActions(scenario);
                 }
             }
         }
     }
 
-    private static void executeScenarioItem(SM_SCENARIO_ITEM item) {
-        SM_ACTOR actor = MongoDbProvider.getActor(item.actorId);
-        actor.value = item.actorValue;
-        MongoDbProvider.saveActor(actor);
-        System.out.println("Scenario Executed");
+    private static void executeScenarioActions(SM_SCENARIO scenario) {
+        List<SM_SCENARIO_ACTION> actions = MongoDbProvider.getScenarioActions(scenario.getId().toString());
+
+        for (SM_SCENARIO_ACTION action: actions) {
+            SM_ACTOR actor = MongoDbProvider.getActor(action.actorId);
+            if (actor != null) {
+                actor.value = action.actorValue;
+                InfluxProvider.writeToInfluxData(actor.measurment, actor.fieldName, actor.value);
+                MongoDbProvider.saveActor(actor);
+            }
+        }
+        System.out.println("All actions executed");
     }
 
 }

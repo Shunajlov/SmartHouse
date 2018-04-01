@@ -1,11 +1,11 @@
 package com.smartcity.smartHouse;
 
 import com.smartcity.smartHouse.ScenarioManager.ScenarioManager;
-import com.smartcity.smartHouse.SensorsManager.SensorsManager;
 import com.smartcity.smartHouse.dataModel.Storage.SM_EXTREME;
 import com.smartcity.smartHouse.dataModel.Storage.SM_SENSOR;
 import com.smartcity.smartHouse.db.InfluxProvider;
 import com.smartcity.smartHouse.db.MongoDbProvider;
+import com.smartcity.smartHouse.utils.DefaultManager;
 import io.vertx.core.Verticle;
 import io.vertx.core.Vertx;
 
@@ -21,12 +21,12 @@ class Main {
         InfluxProvider.initInflux();
 
 //        SensorsManager.setupDefaultUsers();
-//        SensorsManager.setupDefaultSensorsAndActors();
-        SensorsManager.getAndStartAllSensorsAndActors();
-//        SensorsManager.setupDefaultScenario();
+//        DefaultManager.setupDefaultSensorsAndActors();
+        DefaultManager.setupDefaultScenario();
+
+        startVertx();
 
         startScenarioManager();
-        startVertx();
     }
 
     private static void startScenarioManager() {
@@ -35,7 +35,7 @@ class Main {
         timer.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
-                List<SM_SENSOR> sensors = MongoDbProvider.getAllSensors();
+                List<SM_SENSOR> sensors = MongoDbProvider.getAllSensors(false);
                 if (sensors != null) {
                     ScenarioManager.sensors = sensors;
                     ScenarioManager.querySensors();

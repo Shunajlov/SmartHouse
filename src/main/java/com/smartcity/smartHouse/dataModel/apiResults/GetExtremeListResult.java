@@ -1,8 +1,9 @@
 package com.smartcity.smartHouse.dataModel.apiResults;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class GetExtremeListResult {
+public class GetExtremeListResult implements Serializable {
     private ArrayList<GetExtremeResult> extremes;
 
     public GetExtremeListResult(ArrayList<GetExtremeResult> extremes) {
