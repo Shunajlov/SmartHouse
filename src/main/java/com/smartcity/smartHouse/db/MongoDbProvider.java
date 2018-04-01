@@ -434,6 +434,25 @@ public class MongoDbProvider {
         }
     }
 
+    public static void addExtremeForSensor(String houseId, String sensorId, String value) {
+
+        final List<SM_EXTREME> extremes = datastore.createQuery(SM_EXTREME.class)
+            .field("sensorId").equal(sensorId)
+            .asList();
+
+        if (extremes == null || extremes.isEmpty()) {
+            SM_EXTREME extreme = new SM_EXTREME();
+            extreme.sensorId = sensorId;
+            extreme.houseId = houseId;
+            extreme.value = value;
+            MongoDbProvider.saveExtreme(extreme);
+        } else {
+            SM_EXTREME extreme = extremes.get(0);
+            extreme.value = value;
+            MongoDbProvider.saveExtreme(extreme);
+        }
+    }
+
     public static void saveExtreme(SM_EXTREME extreme) { datastore.save(extreme); }
 
     // SM_SCENARIO

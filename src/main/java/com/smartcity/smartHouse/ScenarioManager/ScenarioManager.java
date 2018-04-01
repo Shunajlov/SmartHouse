@@ -36,7 +36,7 @@ public class ScenarioManager {
         extreme.houseId = sensor.houseId;
         extreme.sensorId = sensor.getId().toString();
         extreme.value = value.toString();
-        MongoDbProvider.saveExtreme(extreme);
+        MongoDbProvider.addExtremeForSensor(sensor.houseId, sensor.getId().toString(), value.toString());
         System.out.println("Extreme SITUATION, sensorId: " + sensor.getId().toString());
     }
 
