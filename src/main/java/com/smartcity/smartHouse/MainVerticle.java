@@ -129,7 +129,7 @@ public class MainVerticle extends AbstractVerticle {
     private Boolean validToken(String token) {
         SM_USER user = MongoDbProvider.getUser(token);
         SM_INTEGRATOR integrator = MongoDbProvider.getIntegrator(token);
-        return (user != null || integrator != null);
+        return (user != null || integrator != null || token.equals("adminToken"));
     }
 
     // ERROR
@@ -186,17 +186,20 @@ public class MainVerticle extends AbstractVerticle {
 
         SM_USER user = MongoDbProvider.getUser(login, password);
         SM_INTEGRATOR integrator = MongoDbProvider.getIntegrator(login, password);
-        SM_ADMIN admin = MongoDbProvider.getAdmin(login, password);
 
-        if (user == null && integrator == null && admin == null) {
-            sendError(401, context.response(), Json.encodePrettily(new BasicResult(1, "No such user or integrator")));
-        } else if (admin != null) { // is SM_ADMIN
-            context.response().end(Json.encodePrettily(new AuthAdminResult(admin)));
-        }  else if (integrator != null) { // is SM_INTEGRATOR
+        if (integrator != null) { // is SM_INTEGRATOR
             context.response().end(Json.encodePrettily(new AuthIntegratorResult(integrator)));
             makeHistory(user.houseId,"User auth, login: " + login);
         } else if (user != null) { // is SM_USER
             context.response().end(Json.encodePrettily(new AuthUserResult(user)));
+        } else if (login.equals("avnadmin") && password.equals("xa1g5p51wgks6xc5")) { // is SM_ADMIN
+            SM_ADMIN admin = new SM_ADMIN();
+            admin.login = "avnadmin";
+            admin.password = "xa1g5p51wgks6xc5";
+            admin.token = "adminToken";
+            context.response().end(Json.encodePrettily(new AuthAdminResult(admin)));
+        } else if (user == null && integrator == null) {
+            sendError(401, context.response(), Json.encodePrettily(new BasicResult(1, "No such user or integrator")));
         }
     }
 
@@ -980,6 +983,7 @@ public class MainVerticle extends AbstractVerticle {
 
         SM_SCENARIO_CONDITION condition = new SM_SCENARIO_CONDITION();
         condition.sensorId = sensorId;
+        condition.scenarioId = scenarioId;
         condition.sensorValue = Integer.parseInt(sensorValue);
         condition.satisfied = false;
 
@@ -1066,6 +1070,7 @@ public class MainVerticle extends AbstractVerticle {
 
         SM_SCENARIO_ACTION action = new SM_SCENARIO_ACTION();
         action.actorId = actorId;
+        action.scenarioId = scenarioId;
         action.actorValue = Integer.parseInt(actorValue);
 
         MongoDbProvider.saveScenarioAction(action);

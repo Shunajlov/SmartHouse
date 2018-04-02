@@ -6,7 +6,7 @@ import com.smartcity.smartHouse.dataModel.Storage.SM_ADMIN;
 import java.io.Serializable;
 
 public class AuthAdminResult implements Serializable {
-    protected String id, login, password, token;
+    protected String login, password, token;
     protected UserType userType;
 
     public AuthAdminResult() {
@@ -14,19 +14,10 @@ public class AuthAdminResult implements Serializable {
     }
 
     public AuthAdminResult(SM_ADMIN admin) {
-        id = admin.getId().toString();
         login = admin.login;
         password = admin.password;
         token = admin.token;
         userType = UserType.ADMIN;
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
     }
 
     public String getLogin() {

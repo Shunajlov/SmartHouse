@@ -41,22 +41,25 @@ public class ScenarioManager {
     public static void checkForScenarios(SM_SENSOR sensor) {
         List<SM_SCENARIO> scenarios = MongoDbProvider.getScenarioList(sensor.houseId);
 
-        for (SM_SCENARIO scenario: scenarios) {
-            Boolean allConditionsSatisfied = true;
-            List<SM_SCENARIO_CONDITION> conditions = MongoDbProvider.getScenarioConditions(scenario.getId().toString(), false);
-            if (conditions != null && !conditions.isEmpty()) {
-                for (SM_SCENARIO_CONDITION condition: conditions) {
-                    if (condition.sensorId.equals(sensor.getId().toString())) {
-                        if (sensor.value >= condition.sensorValue) {
-                            condition.satisfied = true;
-                        } else {
-                            condition.satisfied = false;
-                            allConditionsSatisfied = false;
+        if (scenarios != null && !scenarios.isEmpty()) {
+            for (SM_SCENARIO scenario: scenarios) {
+                Boolean allConditionsSatisfied = true;
+                List<SM_SCENARIO_CONDITION> conditions = MongoDbProvider.getScenarioConditions(scenario.getId().toString(), true);
+                if (conditions != null && !conditions.isEmpty()) {
+                    System.out.println("Conditions");
+                    for (SM_SCENARIO_CONDITION condition: conditions) {
+                        if (condition.sensorId.equals(sensor.getId().toString())) {
+                            if (sensor.value >= condition.sensorValue) {
+                                condition.satisfied = true;
+                            } else {
+                                condition.satisfied = false;
+                                allConditionsSatisfied = false;
+                            }
                         }
                     }
-                }
-                if (allConditionsSatisfied) {
-                    executeScenarioActions(scenario);
+                    if (allConditionsSatisfied) {
+                        executeScenarioActions(scenario);
+                    }
                 }
             }
         }
@@ -65,15 +68,19 @@ public class ScenarioManager {
     private static void executeScenarioActions(SM_SCENARIO scenario) {
         List<SM_SCENARIO_ACTION> actions = MongoDbProvider.getScenarioActions(scenario.getId().toString());
 
-        for (SM_SCENARIO_ACTION action: actions) {
-            SM_ACTOR actor = MongoDbProvider.getActor(action.actorId);
-            if (actor != null) {
-                actor.value = action.actorValue;
-                InfluxProvider.writeToInfluxData(actor.measurment, actor.fieldName, actor.value);
-                MongoDbProvider.saveActor(actor);
+        if (actions != null) {
+            for (SM_SCENARIO_ACTION action: actions) {
+                SM_ACTOR actor = MongoDbProvider.getActor(action.actorId);
+                if (actor != null) {
+                    actor.value = action.actorValue;
+                    InfluxProvider.writeToInfluxData(actor.measurment, actor.fieldName, actor.value);
+                    MongoDbProvider.saveActor(actor);
+                }
             }
+            System.out.println("All actions executed");
+        } else {
+            System.out.println("No actions");
         }
-        System.out.println("All actions executed");
     }
 
 }
