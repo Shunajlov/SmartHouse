@@ -46,7 +46,6 @@ public class ScenarioManager {
                 Boolean allConditionsSatisfied = true;
                 List<SM_SCENARIO_CONDITION> conditions = MongoDbProvider.getScenarioConditions(scenario.getId().toString(), true);
                 if (conditions != null && !conditions.isEmpty()) {
-                    System.out.println("Conditions");
                     for (SM_SCENARIO_CONDITION condition: conditions) {
                         if (condition.sensorId.equals(sensor.getId().toString())) {
                             if (sensor.value >= condition.sensorValue) {
