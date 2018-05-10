@@ -1,6 +1,5 @@
 package com.smartcity.smartHouse.ScenarioManager;
 
-import com.mongodb.Mongo;
 import com.smartcity.smartHouse.dataModel.Storage.*;
 import com.smartcity.smartHouse.db.InfluxProvider;
 import com.smartcity.smartHouse.db.MongoDbProvider;
@@ -48,7 +47,40 @@ public class ScenarioManager {
                 if (conditions != null && !conditions.isEmpty()) {
                     for (SM_SCENARIO_CONDITION condition: conditions) {
                         if (condition.sensorId.equals(sensor.getId().toString())) {
-                            if (sensor.value >= condition.sensorValue) {
+                            Boolean sat = false;
+                            switch (condition.type) {
+                                case MORE:
+                                    if (sensor.value > condition.sensorValue) {
+                                        sat = true;
+                                    }
+                                    break;
+
+                                case MOREEQUAL:
+                                    if (sensor.value >= condition.sensorValue) {
+                                        sat = true;
+                                    }
+                                    break;
+
+                                case EQUAL:
+                                    if (sensor.value == condition.sensorValue) {
+                                        sat = true;
+                                    }
+                                    break;
+
+                                case LESSEQUAL:
+                                    if (sensor.value <= condition.sensorValue) {
+                                        sat = true;
+                                    }
+                                    break;
+
+                                case LESS:
+                                    if (sensor.value < condition.sensorValue) {
+                                        sat = true;
+                                    }
+                                    break;
+                            }
+
+                            if (sat) {
                                 condition.satisfied = true;
                             } else {
                                 condition.satisfied = false;

@@ -12,6 +12,9 @@ import com.smartcity.smartHouse.db.MongoDbProvider;
 import com.smartcity.smartHouse.utils.Utils;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Future;
+import io.vertx.core.buffer.Buffer;
+import io.vertx.core.datagram.DatagramSocket;
+import io.vertx.core.datagram.DatagramSocketOptions;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.core.http.HttpServerResponse;
 import io.vertx.core.json.Json;
@@ -47,6 +50,7 @@ public class MainVerticle extends AbstractVerticle {
             .allowedMethods(allowMethods));
 
         setupRoutes(router);
+//        setupSocket();
 
         vertx.createHttpServer()
             .requestHandler(router::accept)
@@ -59,6 +63,32 @@ public class MainVerticle extends AbstractVerticle {
             });
         System.out.println("HTTP server started on port 8080");
     }
+
+//    private void setupSocket() {
+//        DatagramSocket socket = vertx.createDatagramSocket(new DatagramSocketOptions());
+//        Buffer buffer = Buffer.buffer("content");
+//
+//        socket.listen(1234, "0.0.0.0", asyncResult -> {
+//            if (asyncResult.succeeded()) {
+//                socket.handler(packet -> {
+//                    // Do something with the packet
+//                });
+//            } else {
+//                System.out.println("Listen failed" + asyncResult.cause());
+//            }
+//        });
+//
+//        // Send a Buffer
+//        socket.send(buffer, 1234, "10.0.0.1", asyncResult -> {
+//            System.out.println("Send succeeded? " + asyncResult.succeeded());
+//        });
+//
+//// Send a String
+//        socket.send("A string used as content", 1234, "10.0.0.1", asyncResult -> {
+//            System.out.println("Send succeeded? " + asyncResult.succeeded());
+//        });
+//    }
+
 
     private void setupRoutes(Router router) {
 
@@ -148,8 +178,8 @@ public class MainVerticle extends AbstractVerticle {
         String token = context.request().getParam("token");
 
         if (!validToken(token)) {
-            sendBadTokenError(context.response());
-            return;
+//            sendBadTokenError(context.response());
+//            return;
         }
 
         String endpoint = context.request().getParam("endpoint");
@@ -164,8 +194,8 @@ public class MainVerticle extends AbstractVerticle {
         String token = context.request().getParam("token");
 
         if (!validToken(token)) {
-            sendBadTokenError(context.response());
-            return;
+//            sendBadTokenError(context.response());
+//            return;
         }
 
         String endpoint = context.request().getParam("endpoint");

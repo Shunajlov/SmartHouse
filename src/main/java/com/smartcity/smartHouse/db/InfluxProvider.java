@@ -19,15 +19,18 @@ import java.util.concurrent.TimeUnit;
 
 public class InfluxProvider {
 
-//    новые данные для подключения
-//    инфлюкс:   influx-funesu-cf9a.aivencloud.com:27077
+//    инфлюкс: influx-nufuxekago-2672.aivencloud.com:20897
 //    логин: avnadmin
-//    пароль: dcmmpnnce9i6crnb
+//    пароль: vuafqasrhd1co0e3
+//
+//    графана:   grafana-nufuxekago-2672.aivencloud.com
+//    логин: avnadmin
+//    пароль: abhwhs1cq9rz0n1x
 
     private static String DB_NAME = "defaultdb";
-    private static String SERVER_ENDPOINT = "https://influx-funesu-cf9a.aivencloud.com:27077";
+    private static String SERVER_ENDPOINT = "https://influx-nufuxekago-2672.aivencloud.com:20897";
     private static String USERNAME = "avnadmin";
-    private static String PASSWORD = "dcmmpnnce9i6crnb";
+    private static String PASSWORD = "vuafqasrhd1co0e3";
     private static InfluxDB client;
 
     public static void connectInfluxDB(String endpoint, String dbName, String username, String password) {
@@ -39,7 +42,11 @@ public class InfluxProvider {
     }
 
     public static void initInflux() {
-        client = InfluxDBFactory.connect(SERVER_ENDPOINT, USERNAME, PASSWORD);
+        try {
+            client = InfluxDBFactory.connect(SERVER_ENDPOINT, USERNAME, PASSWORD);
+        } catch (Exception e) {
+            System.out.println("ERROR! NO INFLUXDB CONNECTION, RESTART SERVER TO RECCONNECT!\nOr send viable InfluxDb configuration via /api/setupInflux/:endpoint/:dbName/:username/:password/:token");
+        }
     }
 
     public static Double querySensorData(SM_SENSOR sensor) {
