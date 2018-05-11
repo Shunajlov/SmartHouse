@@ -46,7 +46,7 @@ public class Const {
     public static final String SCENARIO_ADD = "/api/scenarioAdd/:houseId/:name/:token";
     public static final String SCENARIO_EDIT = "/api/scenarioEdit/:scenarioId/:name/:token";
     public static final String SCENARIO_CONDITIONS = "/api/scenarioConditions/:scenarioId/:token";
-    public static final String SCENARIO_ADD_CONDITION = "/api/scenarioAddCondition/:scenarioId/:sensorId/:sensorValue/:token";
+    public static final String SCENARIO_ADD_CONDITION = "/api/scenarioAddCondition/:scenarioId/:sensorId/:sensorValue/:type/:token";
     public static final String SCENARIO_REMOVE_CONDITION = "/api/scenarioRemoveCondition/:scenarioId/:conditionId/:token";
     public static final String SCENARIO_ACTIONS = "/api/scenarioActions/:scenarioId/:token";
     public static final String SCENARIO_ADD_ACTION = "/api/scenarioAddAction/:scenarioId/:actorId/:actorValue/:token";

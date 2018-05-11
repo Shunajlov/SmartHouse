@@ -1,10 +1,7 @@
 package com.smartcity.smartHouse;
 
 import com.mongodb.Mongo;
-import com.smartcity.smartHouse.Enums.UserPlanType;
-import com.smartcity.smartHouse.Enums.UserType;
-import com.smartcity.smartHouse.Enums.ActorType;
-import com.smartcity.smartHouse.Enums.SensorType;
+import com.smartcity.smartHouse.Enums.*;
 import com.smartcity.smartHouse.dataModel.Storage.*;
 import com.smartcity.smartHouse.dataModel.apiResults.*;
 import com.smartcity.smartHouse.db.InfluxProvider;
@@ -1004,6 +1001,7 @@ public class MainVerticle extends AbstractVerticle {
         String scenarioId = context.request().getParam("scenarioId");
         String sensorId = context.request().getParam("sensorId");
         String sensorValue = context.request().getParam("sensorValue");
+        String type = context.request().getParam("type");
 
         SM_SCENARIO scenario = MongoDbProvider.getScenario(scenarioId);
         if (scenario == null) {
@@ -1016,6 +1014,7 @@ public class MainVerticle extends AbstractVerticle {
         condition.scenarioId = scenarioId;
         condition.sensorValue = Integer.parseInt(sensorValue);
         condition.satisfied = false;
+        condition.type = ConditionType.valueOf(type);
 
         MongoDbProvider.saveScenarioCondition(condition);
 
