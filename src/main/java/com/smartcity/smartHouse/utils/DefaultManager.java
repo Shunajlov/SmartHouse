@@ -1,6 +1,7 @@
 package com.smartcity.smartHouse.utils;
 
 import com.mongodb.Mongo;
+import com.smartcity.smartHouse.Enums.ConditionType;
 import com.smartcity.smartHouse.Enums.UserPlanType;
 import com.smartcity.smartHouse.dataModel.Storage.SM_SCENARIO;
 import com.smartcity.smartHouse.dataModel.Storage.SM_SCENARIO_ACTION;
@@ -57,6 +58,7 @@ public class DefaultManager {
         SM_SCENARIO_CONDITION condition = new SM_SCENARIO_CONDITION();
         condition.sensorId = "5abd49069433ee36debb84d5";
         condition.sensorValue = 150;
+        condition.type = ConditionType.MORE;
 
         MongoDbProvider.saveScenarioCondition(condition);
 

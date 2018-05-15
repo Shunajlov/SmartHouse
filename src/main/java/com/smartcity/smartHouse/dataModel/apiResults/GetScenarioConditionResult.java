@@ -1,5 +1,6 @@
 package com.smartcity.smartHouse.dataModel.apiResults;
 
+import com.smartcity.smartHouse.Enums.ConditionType;
 import com.smartcity.smartHouse.dataModel.Storage.SM_SCENARIO_CONDITION;
 
 import java.io.Serializable;
@@ -8,11 +9,13 @@ public class GetScenarioConditionResult implements Serializable {
     public String id;
     public String sensorId;
     public Integer sensorValue;
+    public ConditionType type;
 
     public GetScenarioConditionResult(SM_SCENARIO_CONDITION condition) {
         id = condition.getId().toString();
         sensorId = condition.sensorId;
         sensorValue = condition.sensorValue;
+        type = condition.type;
     }
 
     public String getId() {

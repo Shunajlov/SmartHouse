@@ -22,7 +22,7 @@ class Main {
 
 //        SensorsManager.setupDefaultUsers();
 //        DefaultManager.setupDefaultSensorsAndActors();
-        DefaultManager.setupDefaultScenario();
+//        DefaultManager.setupDefaultScenario();
 
         startVertx();
 

@@ -8,5 +8,4 @@ public class SM_INTEGRATOR extends BaseEntity {
     public String login;
     public String password;
     public String token;
-
 }

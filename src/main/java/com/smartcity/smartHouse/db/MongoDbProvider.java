@@ -11,7 +11,7 @@ import java.util.*;
 
 public class MongoDbProvider {
 
-    private static String ENDPOINT = "159.65.120.1:27017";
+    private static String ENDPOINT = "127.0.0.1:27017";
     private static String DATABASE = "admin";
 //    private static String user = "ADMIN";
 //    private static String password = "PASS";

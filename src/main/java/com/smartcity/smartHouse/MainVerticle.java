@@ -61,32 +61,6 @@ public class MainVerticle extends AbstractVerticle {
         System.out.println("HTTP server started on port 8080");
     }
 
-//    private void setupSocket() {
-//        DatagramSocket socket = vertx.createDatagramSocket(new DatagramSocketOptions());
-//        Buffer buffer = Buffer.buffer("content");
-//
-//        socket.listen(1234, "0.0.0.0", asyncResult -> {
-//            if (asyncResult.succeeded()) {
-//                socket.handler(packet -> {
-//                    // Do something with the packet
-//                });
-//            } else {
-//                System.out.println("Listen failed" + asyncResult.cause());
-//            }
-//        });
-//
-//        // Send a Buffer
-//        socket.send(buffer, 1234, "10.0.0.1", asyncResult -> {
-//            System.out.println("Send succeeded? " + asyncResult.succeeded());
-//        });
-//
-//// Send a String
-//        socket.send("A string used as content", 1234, "10.0.0.1", asyncResult -> {
-//            System.out.println("Send succeeded? " + asyncResult.succeeded());
-//        });
-//    }
-
-
     private void setupRoutes(Router router) {
 
         router.get(Const.PING).handler(this::handlePing);
@@ -224,6 +198,9 @@ public class MainVerticle extends AbstractVerticle {
             admin.login = "avnadmin";
             admin.password = "xa1g5p51wgks6xc5";
             admin.token = "adminToken";
+            if (MongoDbProvider.getAdmin(admin.token) == null) {
+                MongoDbProvider.saveAdmin(admin);
+            }
             context.response().end(Json.encodePrettily(new AuthAdminResult(admin)));
         } else if (user == null && integrator == null) {
             sendError(401, context.response(), Json.encodePrettily(new BasicResult(1, "No such user or integrator")));
