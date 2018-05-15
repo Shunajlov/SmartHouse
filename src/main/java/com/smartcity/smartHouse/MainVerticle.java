@@ -193,10 +193,10 @@ public class MainVerticle extends AbstractVerticle {
             makeHistory(user.houseId,"User auth, login: " + login);
         } else if (user != null) { // is SM_USER
             context.response().end(Json.encodePrettily(new AuthUserResult(user)));
-        } else if (login.equals("avnadmin") && password.equals("xa1g5p51wgks6xc5")) { // is SM_ADMIN
+        } else if (login.equals("avnadmin") && password.equals("password")) { // is SM_ADMIN
             SM_ADMIN admin = new SM_ADMIN();
             admin.login = "avnadmin";
-            admin.password = "xa1g5p51wgks6xc5";
+            admin.password = "password";
             admin.token = "adminToken";
             if (MongoDbProvider.getAdmin(admin.token) == null) {
                 MongoDbProvider.saveAdmin(admin);
@@ -243,14 +243,14 @@ public class MainVerticle extends AbstractVerticle {
     }
 
     private void handleIntegratorAdd(RoutingContext context) {
-        String token = context.request().getParam("token");
-
-        SM_ADMIN admin = MongoDbProvider.getAdmin(token);
-
-        if (admin == null) {
-            sendBadTokenError(context.response());
-            return;
-        }
+//        String token = context.request().getParam("token");
+//
+//        SM_ADMIN admin = MongoDbProvider.getAdmin(token);
+//
+//        if (admin == null) {
+//            sendBadTokenError(context.response());
+//            return;
+//        }
 
         String login = context.request().getParam("login");
 
@@ -272,20 +272,20 @@ public class MainVerticle extends AbstractVerticle {
     }
 
     private void handleIntegratorDelete(RoutingContext context) {
-        String token = context.request().getParam("token");
-
-        SM_ADMIN admin = MongoDbProvider.getAdmin(token);
-
-        if (admin == null) {
-            sendBadTokenError(context.response());
-            return;
-        }
+//        String token = context.request().getParam("token");
+//
+//        SM_ADMIN admin = MongoDbProvider.getAdmin(token);
+//
+//        if (admin == null) {
+//            sendBadTokenError(context.response());
+//            return;
+//        }
 
         String login = context.request().getParam("login");
 
         SM_INTEGRATOR integrator = MongoDbProvider.getIntegratorWithLogin(login);
 
-        MongoDbProvider.deleteUser(login);
+        MongoDbProvider.deleteIntegrator(login);
 
         context.response().end(Json.encodePrettily(new BasicResult(1, "Integrator deleted")));
     }

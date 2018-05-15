@@ -1,5 +1,6 @@
 package com.smartcity.smartHouse.db;
 
+import com.mongodb.DB;
 import com.mongodb.Mongo;
 import com.smartcity.smartHouse.ScenarioManager.ScenarioManager;
 import com.smartcity.smartHouse.dataModel.Storage.*;
@@ -125,6 +126,9 @@ public class InfluxProvider {
 
         Date date = new Date();
         long longDate = date.getTime();
+
+        System.out.println("influx " + DB_NAME);
+        System.out.println("SELECT mean(\"" + field + "\") FROM \"autogen\".\"" + measurement + "\" GROUP BY time(1h) fill(none)");
 
         client.write(DB_NAME, "autogen", Point.measurement(measurement)
             .time(longDate, TimeUnit.MILLISECONDS)
