@@ -29,9 +29,9 @@ public class InfluxProvider {
 //    пароль: abhwhs1cq9rz0n1x
 
     private static String DB_NAME = "defaultdb";
-    private static String SERVER_ENDPOINT = "https://influx-19dc6243-mshchurkin-8135.aivencloud.com:29642";
-    private static String USERNAME = "avnadmin";
-    private static String PASSWORD = "msorjz0ykqh30sfg";
+    private static String SERVER_ENDPOINT = "http://127.0.0.1:8086";
+    private static String USERNAME = "superadmin";
+    private static String PASSWORD = "pass";
     private static InfluxDB client;
 
     public static void connectInfluxDB(String endpoint, String dbName, String username, String password) {

@@ -16,41 +16,49 @@ public class DefaultManager {
 
     public static void setupDefaultUsers() {
 
-        SM_USER kichkin = new SM_USER();
-        kichkin.login = "kichkin";
-        kichkin.password = "password";
-        kichkin.name = "Кычкин Алексей Владимирович";
-        kichkin.houseId = "5abd18279433ee27b68c5d11";
-        kichkin.token = Utils.generateToken();
-        kichkin.type = UserPlanType.BASE;
-        MongoDbProvider.saveUser(kichkin);
+        if (MongoDbProvider.getUserWithLogin("kichkin") == null) {
+            SM_USER kichkin = new SM_USER();
+            kichkin.login = "kichkin";
+            kichkin.password = "password";
+            kichkin.name = "Кычкин Алексей Владимирович";
+            kichkin.houseId = "5abd18279433ee27b68c5d11";
+            kichkin.token = Utils.generateToken();
+            kichkin.type = UserPlanType.BASE;
+            MongoDbProvider.saveUser(kichkin);
+        }
 
-        SM_USER vikentieva = new SM_USER();
-        vikentieva.login = "vikentieva";
-        vikentieva.password = "password";
-        vikentieva.name = "Викентьева Ольга Леонидовна";
-        vikentieva.houseId = "5abd18279433ee27b68c5d11";
-        vikentieva.token = Utils.generateToken();
-        vikentieva.type = UserPlanType.BASE;
-        MongoDbProvider.saveUser(vikentieva);
+        if (MongoDbProvider.getUserWithLogin("vikentieva") == null) {
+            SM_USER vikentieva = new SM_USER();
+            vikentieva.login = "vikentieva";
+            vikentieva.password = "password";
+            vikentieva.name = "Викентьева Ольга Леонидовна";
+            vikentieva.houseId = "5abd18279433ee27b68c5d11";
+            vikentieva.token = Utils.generateToken();
+            vikentieva.type = UserPlanType.BASE;
+            MongoDbProvider.saveUser(vikentieva);
+        }
 
-        SM_USER lebedev = new SM_USER();
-        lebedev.login = "lebedev";
-        lebedev.password = "password";
-        lebedev.name = "Лебедев Виктор Валерьевич";
-        lebedev.houseId = "5abd18279433ee27b68c5d11";
-        lebedev.token = Utils.generateToken();
-        lebedev.type = UserPlanType.BASE;
-        MongoDbProvider.saveUser(lebedev);
+        if (MongoDbProvider.getUserWithLogin("lebedev") == null) {
+            SM_USER lebedev = new SM_USER();
+            lebedev.login = "lebedev";
+            lebedev.password = "password";
+            lebedev.name = "Лебедев Виктор Валерьевич";
+            lebedev.houseId = "5abd18279433ee27b68c5d11";
+            lebedev.token = Utils.generateToken();
+            lebedev.type = UserPlanType.BASE;
+            MongoDbProvider.saveUser(lebedev);
+        }
 
-        SM_USER korotun = new SM_USER();
-        korotun.login = "korotun";
-        korotun.password = "password";
-        korotun.name = "Коротун Василиса Павловна";
-        korotun.houseId = "5abd18279433ee27b68c5d11";
-        korotun.token = Utils.generateToken();
-        korotun.type = UserPlanType.BASE;
-        MongoDbProvider.saveUser(korotun);
+        if (MongoDbProvider.getUserWithLogin("korotun") == null) {
+            SM_USER korotun = new SM_USER();
+            korotun.login = "korotun";
+            korotun.password = "password";
+            korotun.name = "Коротун Василиса Павловна";
+            korotun.houseId = "5abd18279433ee27b68c5d11";
+            korotun.token = Utils.generateToken();
+            korotun.type = UserPlanType.BASE;
+            MongoDbProvider.saveUser(korotun);
+        }
     }
 
     public static void setupDefaultScenario() {

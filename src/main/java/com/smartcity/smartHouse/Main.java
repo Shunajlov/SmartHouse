@@ -20,7 +20,7 @@ class Main {
         MongoDbProvider.setupDatastore();
         InfluxProvider.initInflux();
 
-//        SensorsManager.setupDefaultUsers();
+        DefaultManager.setupDefaultUsers();
 //        DefaultManager.setupDefaultSensorsAndActors();
 //        DefaultManager.setupDefaultScenario();
 
@@ -35,10 +35,14 @@ class Main {
         timer.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
-                List<SM_SENSOR> sensors = MongoDbProvider.getAllSensors(false);
-                if (sensors != null) {
-                    ScenarioManager.sensors = sensors;
-                    ScenarioManager.querySensors();
+                try {
+                    List<SM_SENSOR> sensors = MongoDbProvider.getAllSensors(false);
+                    if (sensors != null) {
+                        ScenarioManager.sensors = sensors;
+                        ScenarioManager.querySensors();
+                    }
+                } catch (Exception e) {
+                    System.out.println("Timer Exception: probably Mongo:\n" +  e.getLocalizedMessage());
                 }
             }
         }, 0, 1*5*1000);

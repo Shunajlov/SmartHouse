@@ -35,10 +35,11 @@ public class MongoDbProvider {
             MongoClient mongoClient = new MongoClient(connectionString);
             String dbName = "admin";
             Morphia morphia = new Morphia();
-            morphia.mapPackage("com.smartcity.smartHouse.dataModel.Storage");
+//            morphia.mapPackage("com.smartcity.smartHouse.dataModel.Storage");
+            morphia.map(SM_ACTOR.class, SM_ADMIN.class, SM_EXTREME.class, SM_HISTORY.class, SM_HOUSE.class, SM_INTEGRATOR.class, SM_SCENARIO.class, SM_SCENARIO_ACTION.class, SM_SCENARIO_CONDITION.class, SM_SENSOR.class, SM_USER.class);
             datastore = morphia.createDatastore(mongoClient, dbName);
         } catch (Exception e) {
-            System.out.println("Mongo connection ERROR");
+            System.out.println("Mongo connection ERROR\n" + e.getLocalizedMessage());
         }
     }
 
@@ -596,8 +597,15 @@ public class MongoDbProvider {
         } else {
             SM_SCENARIO_CONDITION condition = conditions.get(0);
             SM_SCENARIO scenario = getScenario(condition.scenarioId);
-            scenario.conditions.remove(condition);
+            for (int i = 0; i < scenario.conditions.size(); i++) {
+                SM_SCENARIO_CONDITION iCondition = scenario.conditions.get(i);
+                if (iCondition.getId().toString().equals(condition.getId().toString())) {
+                    scenario.conditions.remove(i);
+                    break;
+                }
+            }
             datastore.delete(condition);
+            saveScenario(scenario);
             System.out.println("Condition deleted: " + condition.getId().toString());
         }
     }
@@ -629,8 +637,15 @@ public class MongoDbProvider {
         } else {
             SM_SCENARIO_ACTION action = actions.get(0);
             SM_SCENARIO scenario = getScenario(action.scenarioId);
-            scenario.actions.remove(action);
+            for (int i = 0; i < scenario.actions.size(); i++) {
+                SM_SCENARIO_ACTION iAction = scenario.actions.get(i);
+                if (iAction.getId().toString().equals(action.getId().toString())) {
+                    scenario.actions.remove(i);
+                    break;
+                }
+            }
             datastore.delete(action);
+            saveScenario(scenario);
             System.out.println("Action deleted: " + action.getId().toString());
         }
     }

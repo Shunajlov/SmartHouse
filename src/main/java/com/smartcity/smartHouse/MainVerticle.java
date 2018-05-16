@@ -190,9 +190,9 @@ public class MainVerticle extends AbstractVerticle {
 
         if (integrator != null) { // is SM_INTEGRATOR
             context.response().end(Json.encodePrettily(new AuthIntegratorResult(integrator)));
-            makeHistory(user.houseId,"User auth, login: " + login);
         } else if (user != null) { // is SM_USER
             context.response().end(Json.encodePrettily(new AuthUserResult(user)));
+            makeHistory(user.houseId,"User auth, login: " + login);
         } else if (login.equals("avnadmin") && password.equals("password")) { // is SM_ADMIN
             SM_ADMIN admin = new SM_ADMIN();
             admin.login = "avnadmin";
@@ -445,7 +445,8 @@ public class MainVerticle extends AbstractVerticle {
 
             context.response().end(Json.encodePrettily(new GetHousesResult(houses)));
         } else {
-            sendError(401, context.response(), Json.encodePrettily(new BasicResult(1, "No houses")));
+            context.response().end(Json.encodePrettily(new GetHousesResult(houses)));
+//            sendError(401, context.response(), Json.encodePrettily(new BasicResult(1, "No houses")));
         }
     }
 
@@ -956,12 +957,14 @@ public class MainVerticle extends AbstractVerticle {
 
         List<GetScenarioConditionResult> conditions = new ArrayList<>();
 
-        if (scenario.conditions != null && !scenario.conditions.isEmpty()) {
+        if (scenario != null && scenario.conditions != null && !scenario.conditions.isEmpty()) {
             for (SM_SCENARIO_CONDITION condition: scenario.conditions) {
                 conditions.add(new GetScenarioConditionResult(condition));
             }
 
             context.response().end(Json.encodePrettily(new GetScenarioConditionsResult(conditions)));
+        } else if (scenario == null) {
+            sendError(401, context.response(), Json.encodePrettily(new BasicResult(1, "No such scenario")));
         } else {
             sendError(401, context.response(), Json.encodePrettily(new BasicResult(1, "No conditions")));
         }
@@ -1045,12 +1048,14 @@ public class MainVerticle extends AbstractVerticle {
 
         List<GetScenarioActionResult> actions = new ArrayList<>();
 
-        if (scenario.actions != null && !scenario.actions.isEmpty()) {
+        if (scenario != null && scenario.actions != null && !scenario.actions.isEmpty()) {
             for (SM_SCENARIO_ACTION action: scenario.actions) {
                 actions.add(new GetScenarioActionResult(action));
             }
 
             context.response().end(Json.encodePrettily(new GetScenarioActionsResult(actions)));
+        } else if (scenario == null) {
+            sendError(401, context.response(), Json.encodePrettily(new BasicResult(1, "No such scenario")));
         } else {
             sendError(401, context.response(), Json.encodePrettily(new BasicResult(1, "No actions")));
         }
